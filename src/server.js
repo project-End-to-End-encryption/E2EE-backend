@@ -1,8 +1,8 @@
-require('dotenv').config();
-const connectToMongoDB = require('./config/mongo.config');
-const {connectRedis} = require('./config/redis.config')
+import 'dotenv/config'
+import connectToMongoDB from './config/mongo.config.js';
+import {connectRedis}  from './config/redis.config.js';
 
-const app = require('./app')
+import app from './app.js'
 
 const PORT = process.env.PORT || 3000;
 

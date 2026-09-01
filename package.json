@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/project-End-to-End-encryption/E2EE-backend.git"
   },
-  "type": "commonjs",
+  "type": "module",
   "main": "src/server.js",
   "scripts": {
     "start": "nodemon src/server.js"

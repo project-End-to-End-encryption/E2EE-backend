@@ -8,4 +8,4 @@ const jwtConfig = {
     algorithm: "HS256",
 };
 
-module.exports = jwtConfig;
+export default jwtConfig;

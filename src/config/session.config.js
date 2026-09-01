@@ -11,4 +11,4 @@ const sessionConfig = {
     }
 };
 
-module.exports = sessionConfig
+export default sessionConfig
