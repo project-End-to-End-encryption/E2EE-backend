@@ -1,11 +1,11 @@
-const { geminiApiKey } = require("./env");
+import env from "./env.js";
 
 const aiConfig = {
     provider: "gemini",
 
-    apiKey: geminiApiKey,
+    apiKey: env.geminiApiKey,
 
-    model: process.env.GEMINI_MODEL || "gemini-3.5-flash",
+    model: env.geminiModel,
 
     generation: {
         maxOutputTokens: 2000,
@@ -13,4 +13,4 @@ const aiConfig = {
     }
 };
 
-module.exports = aiConfig;
+export default aiConfig;
