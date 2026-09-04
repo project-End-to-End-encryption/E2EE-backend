@@ -1,6 +1,7 @@
 import express from 'express';
 import {NotFoundException} from "./shared/errors/domainErrors.js";
 import {globalErrorHandler} from "./middleware/error.middleware.js";
+import routes from "./routes/index.js";
 
 const app = express();
 
@@ -13,7 +14,9 @@ app.get('/test', (req,res)=>{
     });
 })
 
-app.all('*', (req,res,next) => {
+app.use('/api/v1', routes);
+
+app.all('*path', (req,res,next) => {
     next(NotFoundException(`Can't find  ${req.originalUrl} on this server`));
 });
 
