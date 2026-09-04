@@ -1,4 +1,4 @@
-class AuthRedis {
+class AuthRepository {
     async createAuth(authData){
         throw new Error("Method not implemented.");
     }
@@ -11,6 +11,9 @@ class AuthRedis {
     async updatePassword(authId, hashedPassword){
         throw new Error("Method not implemented.");
     }
+    async deleteAuth(authId){
+        throw new Error("Method not implemented.")
+    }
 }
 
-export default AuthRedis();
+export default AuthRepository;

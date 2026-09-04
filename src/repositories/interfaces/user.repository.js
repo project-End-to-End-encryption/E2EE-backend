@@ -5,18 +5,15 @@ class UserRepository {
     async findByUsername(username){
         throw new Error("Method not implemented.");
     }
-    async findByEmail(email){
-        throw new Error("Method not implemented.");
-    }
     async findByUserId(userId){
         throw new Error("Method not implemented.");
     }
     async updateUser(userId, updateData){
         throw new Error("Method not implemented.");
     }
-    async deleteUser(userid){
+    async deleteUser(userId){
         throw new Error("Method not implemented.");
     }
 }
 
-export default UserRepository();
+export default UserRepository;

@@ -10,7 +10,6 @@ const authSchema = new mongoose.Schema({
     },
     hashedPassword: {
         type: String,
-        required: true,
     },
 }, {timestamps: true});
 
