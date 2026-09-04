@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import bcrypt from 'bcryptjs'
 import {connectRedis} from "../../config/redis.config.js";
 import {REDIS_KEYS} from "../../shared/constants/redisKeys.js";
-import {ConflictException} from "../../shared/errors/domainErrors.js";
+import {ConflictException, BadRequestException} from "../../shared/errors/domainErrors.js";
 import {generateAuthTokens} from "../../shared/utils/jwt.js";
 
 class AuthService{
@@ -10,58 +10,58 @@ class AuthService{
         this.userRepository = userRepository;
         this.authRepository = authRepository;
     }
+    async register({reservationId, email, password}){
+        const redis = await connectRedis();
+        const reservationKey = REDIS_KEYS.usernameReservation(reservationId)
+        const reservationData = await redis.get(reservationKey);
 
-    async register({username, email, password}){
-        const normalizedUsername = username.toLowerCase().trim();
-        const normalizedEmail = email.toLowerCase().trim();
+        if (!reservationData) {
+            throw new BadRequestException(
+                "Username reservation is invalid or has expired"
+            );
+        }
+        const { username } = JSON.parse(reservationData);
 
-        const existingUser = await this.userRepository.findByUsername(normalizedUsername);
+        const existingUser = await this.userRepository.findByUsername(username);
+
         if(existingUser){
             throw new ConflictException('UserName is already taken');
         }
-
+        const normalizedEmail = email.toLowerCase().trim();
         const existingAuth = await this.authRepository.findByEmail(normalizedEmail);
         if (existingAuth) {
             throw new ConflictException('An account with this email already exists');
         }
-
-        const hashedPassword = await bcrypt.hash(password,12);
-
+        const hashedPassword = await bcrypt.hash(password, 12);
         const session = await mongoose.startSession();
-        session.startTransaction();
-
         let newUser;
         let newAuth;
         try{
-            newUser = await this.userRepository.createUser({
-                username: normalizedUsername, session
-            });
+            session.startTransaction();
             newAuth = await this.authRepository.createAuth(
                 {
-                    userId: newUser._id,
                     email: normalizedEmail,
                     hashedPassword,
                     provider: 'local',
                 },
                 session
             );
+            newUser = await this.userRepository.createUser({
+                username, authId: newAuth._id, session
+            });
 
             await session.commitTransaction();
-            session.endSession();
+
         } catch (error){
             await session.abortTransaction();
-            session.endSession();
             throw error;
+        } finally {
+            await session.endSession()
         }
-
-        const redis = await connectRedis();
-        const lockKey = REDIS_KEYS.usernameLock(normalizedUsername);
-        await redis.del(lockKey);
-
-        const token =  generateAuthTokens({
+        await redis.del(reservationKey);
+        const token =  await generateAuthTokens({
             userId: newUser._id,
             authId: newAuth._id,
-            email: newAuth.email
         });
         return {
             user: {
@@ -73,3 +73,4 @@ class AuthService{
         };
     }
 }
+export default AuthService;

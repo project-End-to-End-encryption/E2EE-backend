@@ -16,7 +16,6 @@ const userSchema = new mongoose.Schema({
     },
     fullName: {
         type: String,
-        required: true,
         trim: true,
     },
     userBio:{
@@ -25,7 +24,6 @@ const userSchema = new mongoose.Schema({
     },
     profilePictureUrl:{
         type: String,
-        required: true,
         trim: true,
     }
 

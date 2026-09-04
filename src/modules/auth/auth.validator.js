@@ -2,10 +2,10 @@ import {BadRequestException} from "../../shared/errors/domainErrors.js";
 
 export const validateRegister = (req,res,next)=>{
 
-    const {username, email, password } = req.body;
+    const {reservationId, email, password } = req.body;
 
-    if(!username || typeof username !== 'string'){
-        return next(new BadRequestException('Username is required'));
+    if(!reservationId || typeof reservationId !== 'string'){
+        return next(new BadRequestException('ReservationId is required'));
     }
     if (!email || typeof email !== 'string') {
         return next(new BadRequestException('Email is required'));
@@ -19,7 +19,6 @@ export const validateRegister = (req,res,next)=>{
         return next(new BadRequestException('Password must be at least 8 characters long and contain at least one special character.'))
     }
 
-    req.body.username = username.trim().toLowerCase();
     req.body.email = email.trim().toLowerCase();
     next();
 }
