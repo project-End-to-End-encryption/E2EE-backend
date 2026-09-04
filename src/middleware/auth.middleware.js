@@ -1,10 +1,11 @@
 import {verifyAccessToken} from '../shared/utils/jwt.js'
+import {InvalidTokenException} from "../shared/errors/domainErrors.js";
 
 export const authenticate = (req,res,next) => {
     const authHeader = req.headers.authorization;
 
     if(!authHeader || !authHeader.startsWith('Bearer ')){
-        return res.status(401).json({message: 'Authentication token required'});
+        return next(new InvalidTokenException('Authentication token required','TOKEN_REQUIRED'));
     }
 
     const token = authHeader.split(' ')[1];
@@ -14,12 +15,9 @@ export const authenticate = (req,res,next) => {
         req.user = decoded;
         next();
     } catch (error){
-        if(error.name === 'TokenExpiredError'){
-            return res.status(401).json({
-                code: 'TOKEN_EXPIRED',
-                message: 'Access token has expired'
-            });
+        if (error.name === 'TokenExpiredError') {
+            return next(new InvalidTokenException('Access token has expired', 'TOKEN_EXPIRED'));
         }
-        return res.status(401).json({code: 'INVALID_TOKEN', message: 'Invalid access token'});
+        return next(new InvalidTokenException('Invalid access token', 'INVALID_TOKEN'));
     }
 };
