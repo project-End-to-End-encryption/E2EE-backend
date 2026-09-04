@@ -1,3 +1,6 @@
+import dotenv from 'dotenv'
+dotenv.config()
+
 const minioConfig = {
     endpoint: process.env.MINIO_ENDPOINT,
 

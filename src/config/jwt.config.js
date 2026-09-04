@@ -1,5 +1,9 @@
+import dotenv from 'dotenv'
+dotenv.config()
 const jwtConfig = {
-    secret: process.env.JWT_SECRET,
+    accessSecret: process.env.JWT_ACCESS_SECRET,
+
+    refreshSecret: process.env.JWT_REFRESH_SECREAT,
 
     accessTokenExpiry: process.env.JWT_ACCESS_TOKEN_EXPIRY,
 

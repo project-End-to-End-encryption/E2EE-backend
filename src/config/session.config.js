@@ -1,3 +1,6 @@
+import dotenv from 'dotenv'
+dotenv.config()
+
 const sessionConfig = {
     cookieName: process.env.SESSION_COOKIE_NAME,
 
