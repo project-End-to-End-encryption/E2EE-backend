@@ -1,4 +1,4 @@
-import {connectRedis} from '../../config/redis.config.js'
+import redisClient from "../../config/redis.config.js";
 import {REDIS_KEYS} from "../../shared/constants/redisKeys.js";
 import {ConflictException} from "../../shared/errors/domainErrors.js";
 import crypto from 'crypto';
@@ -17,7 +17,7 @@ class UsernameService{
             throw new ConflictException("Username is already taken");
         }
 
-        const redis = await connectRedis();
+        const redis = redisClient;
 
         const reservationId = crypto.randomUUID();
         const reservationKey = REDIS_KEYS.usernameReservation(reservationId);

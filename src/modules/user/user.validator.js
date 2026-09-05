@@ -9,7 +9,7 @@ export const validateCheckUsername = (req,res,next) => {
 
     const trimmed = username.trim();
 
-    if(trimmed.length < 3 || trimmed.length > 30){
+    if(trimmed.length < 3 || trimmed.length > 20){
         return next(new BadRequestException('Username must be between 3 and 30 characters'));
     }
 

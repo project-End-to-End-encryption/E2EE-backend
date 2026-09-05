@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from 'bcryptjs'
 import crypto from "crypto";
-import {connectRedis} from "../../config/redis.config.js";
+import redisClient from "../../config/redis.config.js";
 import {REDIS_KEYS} from "../../shared/constants/redisKeys.js";
 import {ConflictException, BadRequestException} from "../../shared/errors/domainErrors.js";
 import {generateAuthTokens} from "../../shared/utils/jwt.js";
@@ -14,7 +14,7 @@ class AuthService{
         this.sessionRepository = sessionRepository;
     }
     async register({reservationId, email, password}, userAgent){
-        const redis = await connectRedis();
+        const redis = redisClient
         const reservationKey = REDIS_KEYS.usernameReservation(reservationId)
         const reservationData = await redis.get(reservationKey);
 
