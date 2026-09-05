@@ -2,6 +2,7 @@ import {asyncHandler} from "../../shared/utils/asyncHandler.js";
 import MongoUserRepository from "../../repositories/implementations/mongodb/mongo.user.repository.js";
 import MongoAuthRepository from "../../repositories/implementations/mongodb/mongo.auth.repository.js";
 import AuthService from "./auth.service.js";
+import {CreateResponse} from "../../shared/utils/response.js";
 
 
 const userRepository = new MongoUserRepository();
@@ -32,14 +33,26 @@ export const register = asyncHandler(async (req,res) =>{
         maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
-    res.status(201).json({
-        status: 'success',
-        message: 'Account created successfully',
-        data:{
-            debugTokens:{
-                accessToken: accessToken,
-                refreshToken: refreshToken
+    // res.status(201).json({
+    //     status: 'success',
+    //     message: 'Account created successfully',
+    //     data:{
+    //         debugTokens:{
+    //             accessToken: accessToken,
+    //             refreshToken: refreshToken
+    //         }
+    //     }
+    // });
+
+    res.status(201).json(
+        new CreateResponse(
+            'Account created successfully',
+            {
+                debugTokens:{
+                    accessToken: accessToken,
+                    refreshToken: refreshToken
+                }
             }
-        }
-    });
+        )
+    );
 });
