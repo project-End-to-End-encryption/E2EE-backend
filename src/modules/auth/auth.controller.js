@@ -3,17 +3,23 @@ import MongoUserRepository from "../../repositories/implementations/mongodb/mong
 import MongoAuthRepository from "../../repositories/implementations/mongodb/mongo.auth.repository.js";
 import AuthService from "./auth.service.js";
 import {CreateResponse} from "../../shared/utils/response.js";
-
+import MongoSessionRepository from "../../repositories/implementations/mongodb/mongo.session.repository.js";
 
 const userRepository = new MongoUserRepository();
 const authRepository = new MongoAuthRepository();
-const authService = new AuthService(userRepository,authRepository);
+const sessionRepository = new MongoSessionRepository();
+const authService = new AuthService(userRepository,authRepository,sessionRepository);
 
 export const register = asyncHandler(async (req,res) =>{
     const {reservationId, email, password } = req.body;
 
-    const {user, accessToken, refreshToken } =
-        await authService.register({reservationId,email,password});
+    const {user, accessToken, refreshToken, sessionId } =
+        await authService.register({
+            reservationId,
+            email,
+            password},
+            req.headers['user-agent']
+        );
 
     const isProduction = process.env.NODE_ENV === 'prod';
 
@@ -33,16 +39,10 @@ export const register = asyncHandler(async (req,res) =>{
         maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
-    // res.status(201).json({
-    //     status: 'success',
-    //     message: 'Account created successfully',
-    //     data:{
-    //         debugTokens:{
-    //             accessToken: accessToken,
-    //             refreshToken: refreshToken
-    //         }
-    //     }
-    // });
+    res.cookie('sessionId', sessionId,{
+        ...cookieOption,
+        maxAge: 7 * 24 * 60 * 60 * 1000
+    });
 
     res.status(201).json(
         new CreateResponse(
@@ -50,7 +50,8 @@ export const register = asyncHandler(async (req,res) =>{
             {
                 debugTokens:{
                     accessToken: accessToken,
-                    refreshToken: refreshToken
+                    refreshToken: refreshToken,
+                    sessionId: sessionId
                 }
             }
         )

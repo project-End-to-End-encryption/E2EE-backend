@@ -2,8 +2,9 @@ import {User} from '../../../infrastructure/database/mongodb/models/user.model.j
 import UserRepository from '../../interfaces/user.repository.js';
 
 class MongoUserRepository extends UserRepository {
-    async createUser(userData) {
-        return await User.create(userData);
+    async createUser(userData,session) {
+        const [newUser] = await User.create([userData], { session });
+        return newUser;
     }
     async findByUsername(username){
         return await User.findOne({username});

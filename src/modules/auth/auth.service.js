@@ -1,16 +1,19 @@
 import mongoose from "mongoose";
 import bcrypt from 'bcryptjs'
+import crypto from "crypto";
 import {connectRedis} from "../../config/redis.config.js";
 import {REDIS_KEYS} from "../../shared/constants/redisKeys.js";
 import {ConflictException, BadRequestException} from "../../shared/errors/domainErrors.js";
 import {generateAuthTokens} from "../../shared/utils/jwt.js";
+import {getDeviceInfo} from "../../shared/utils/deviceInfo.js";
 
 class AuthService{
-    constructor(userRepository, authRepository) {
+    constructor(userRepository, authRepository, sessionRepository) {
         this.userRepository = userRepository;
         this.authRepository = authRepository;
+        this.sessionRepository = sessionRepository;
     }
-    async register({reservationId, email, password}){
+    async register({reservationId, email, password}, userAgent){
         const redis = await connectRedis();
         const reservationKey = REDIS_KEYS.usernameReservation(reservationId)
         const reservationData = await redis.get(reservationKey);
@@ -46,9 +49,9 @@ class AuthService{
                 },
                 session
             );
-            newUser = await this.userRepository.createUser({
-                username, authId: newAuth._id, session
-            });
+            newUser = await this.userRepository.createUser(
+            {username, authId: newAuth._id}, session
+            );
 
             await session.commitTransaction();
 
@@ -63,13 +66,33 @@ class AuthService{
             userId: newUser._id,
             authId: newAuth._id,
         });
+        const sessionId = crypto.randomBytes(32).toString('hex');
+        const hashedRefreshToken = await bcrypt.hash(
+            token.refreshToken,
+            12
+        )
+        await this.sessionRepository.createSession({
+            sessionId,
+            userId: newUser._id,
+            hashedRefreshToken,
+
+            device: getDeviceInfo(userAgent),
+
+            isActive: true,
+            lastActive: new Date(),
+
+            expiresAt: new Date(
+                Date.now() + 7 * 24 * 60 * 60 * 1000
+            )
+        });
         return {
             user: {
                 id: newUser._id,
                 username: newUser.username,
                 email: newAuth.email
             },
-            ...token
+            ...token,
+            sessionId
         };
     }
 }
