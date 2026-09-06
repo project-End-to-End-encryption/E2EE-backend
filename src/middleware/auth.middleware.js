@@ -3,7 +3,7 @@ import {InvalidTokenException} from "../shared/errors/domainErrors.js";
 
 export const authenticate = (req,res,next) => {
 
-    const token = req.cookie?.accessToken;
+    const token = req.cookies?.accessToken;
 
     if(!token){
         return next(new InvalidTokenException('Authentication token required','TOKEN_REQUIRED'));

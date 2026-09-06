@@ -19,7 +19,7 @@ app.get('/test', (req,res)=>{
 app.use('/api/v1', routes);
 
 app.all('*path', (req,res,next) => {
-    next(NotFoundException(`Can't find  ${req.originalUrl} on this server`));
+    next(new NotFoundException(`Can't find  ${req.originalUrl} on this server`));
 });
 
 app.use(globalErrorHandler)

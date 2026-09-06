@@ -1,5 +1,6 @@
 import {AppError} from "../shared/errors/AppError.js";
 import {ErrorResponse} from "../shared/utils/response.js";
+import multer from "multer";
 
 export const globalErrorHandler = (err,req,res,next) => {
 
@@ -67,6 +68,19 @@ export const globalErrorHandler = (err,req,res,next) => {
                 'Invalid access token',
                 {
                     errorCode: 'INVALID_TOKEN'
+                }
+            )
+        );
+    }
+
+    // Multer error
+    if(err instanceof multer.MulterError){
+        return res.status(400).json(
+            new ErrorResponse(
+                400,
+                'File upload error',
+                {
+                    errorCode: 'TO_LARGE_FILE'
                 }
             )
         );

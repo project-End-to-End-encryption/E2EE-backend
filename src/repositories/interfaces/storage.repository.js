@@ -22,7 +22,9 @@ class StorageRepository {
     async getPresignUrl(bucket, key, expirySeconds){
         throw new Error('Method not implemented.');
     }
-
+    async getObjectBuffer(bucket, key){
+        throw new Error('Method not implemented.');
+    }
 }
 
 export default StorageRepository;

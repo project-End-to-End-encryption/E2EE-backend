@@ -65,6 +65,22 @@ class MinioStorageRepository extends StorageRepository{
     async getPresignedUrl(bucket, key, expirySeconds = 60 * 5){
         return this.client.presignedGetObject(bucket, key, expirySeconds);
     }
+
+    async getPresignedUploadUrl(bucket, key, expirySeconds = 60 * 10){
+        return this.client.presignedPutObject(bucket, key, expirySeconds);
+    }
+
+    async getObjectBuffer(bucket, key) {
+        const stream = await this.client.getObject(bucket, key);
+        const chunks = [];
+        for await (const chunk of stream) chunks.push(chunk);
+        return Buffer.concat(chunks);
+    }
+
+    generateProfilePictureKey(originalName) {
+        const ext = path.extname(originalName || '').toLowerCase();
+        return `profile/${randomUUID()}${ext}`;
+    }
 }
 
 export default MinioStorageRepository;

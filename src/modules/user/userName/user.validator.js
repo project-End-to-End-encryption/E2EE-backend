@@ -1,4 +1,4 @@
-import {BadRequestException} from "../../shared/errors/domainErrors.js";
+import {BadRequestException} from "../../../shared/errors/domainErrors.js";
 
 export const validateCheckUsername = (req,res,next) => {
     const { username } = req.body;
@@ -10,7 +10,7 @@ export const validateCheckUsername = (req,res,next) => {
     const trimmed = username.trim();
 
     if(trimmed.length < 3 || trimmed.length > 20){
-        return next(new BadRequestException('Username must be between 3 and 30 characters'));
+        return next(new BadRequestException('Username must be between 3 and 20 characters'));
     }
 
     const usernameRegex = /^[a-zA-Z0-9_]+$/
