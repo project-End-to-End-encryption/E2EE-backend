@@ -93,3 +93,23 @@ export const login = asyncHandler(async (req,res) =>{
         })
     );
 })
+
+export const logout = asyncHandler(async (req,res) =>{
+    const {sessionId} = req.cookies;
+
+    await authService.logout(sessionId);
+
+    const isProduction = process.env.NODE_ENV === 'prod';
+
+    const cookieOption = {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: 'strict'
+    };
+
+    res.clearCookie('accessToken', cookieOption);
+    res.clearCookie('refreshToken', cookieOption);
+    res.clearCookie('sessionId', cookieOption);
+
+    res.status(200).json(new SuccessResponse('Logged out successfully', null));
+});

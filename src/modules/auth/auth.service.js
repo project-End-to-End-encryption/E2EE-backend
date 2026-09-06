@@ -148,5 +148,11 @@ class AuthService{
             sessionId
         };
     }
+
+    async logout(sessionId){
+        if(!sessionId){
+            await this.sessionRepository.deleteSession(sessionId);
+        }
+    }
 }
 export default AuthService;
