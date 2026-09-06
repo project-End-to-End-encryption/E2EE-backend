@@ -1,7 +1,7 @@
 import {Client} from 'minio';
 import {randomUUID} from 'crypto';
 import path from 'path';
-import StorageRepository from "../../interfaces/storage.repository.js";
+import StorageRepository from "../../interfaces/storage/storage.repository.js";
 import minioConfig from "../../../config/minio.config.js";
 
 class MinioStorageRepository extends StorageRepository{

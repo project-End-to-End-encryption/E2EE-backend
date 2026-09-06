@@ -1,5 +1,5 @@
 import {Session} from "../../../infrastructure/database/mongodb/models/session.model.js";
-import SessionRepository from "../../interfaces/session.repository.js";
+import SessionRepository from "../../interfaces/database/session.repository.js";
 
 class MongoSessionRepository extends SessionRepository{
 

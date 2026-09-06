@@ -2,7 +2,7 @@ import {asyncHandler} from "../../shared/utils/asyncHandler.js";
 import MongoUserRepository from "../../repositories/implementations/mongodb/mongo.user.repository.js";
 import MongoAuthRepository from "../../repositories/implementations/mongodb/mongo.auth.repository.js";
 import AuthService from "./auth.service.js";
-import {CreateResponse} from "../../shared/utils/response.js";
+import {CreateResponse, SuccessResponse} from "../../shared/utils/response.js";
 import MongoSessionRepository from "../../repositories/implementations/mongodb/mongo.session.repository.js";
 
 const userRepository = new MongoUserRepository();
@@ -57,3 +57,39 @@ export const register = asyncHandler(async (req,res) =>{
         )
     );
 });
+
+export const login = asyncHandler(async (req,res) =>{
+    const {email, password} = req.body;
+
+    const {user, accessToken, refreshToken, sessionId} =
+        await authService.login({email,password},req.headers['user-agent']);
+
+    const isProduction = process.env.NODE_ENV === 'prod';
+
+    const cookieOption = {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: 'strict'
+    }
+
+    res.cookie('accessToken', accessToken,{
+        ...cookieOption, maxAge: 15 * 60 * 1000,
+    });
+
+    res.cookie('refreshToken', refreshToken,{
+        ...cookieOption, maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+    res.cookie('sessionId', sessionId,{
+        ...cookieOption, maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+
+    res.status(200).json(
+        new SuccessResponse('Logged in successfully',{
+            debugTokens: {
+                accessToken,
+                refreshToken,
+                sessionId
+            }
+        })
+    );
+})

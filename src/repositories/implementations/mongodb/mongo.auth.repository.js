@@ -1,5 +1,5 @@
 import {Auth} from '../../../infrastructure/database/mongodb/models/auth.model.js'
-import AuthRepository from "../../interfaces/auth.repository.js";
+import AuthRepository from "../../interfaces/database/auth.repository.js";
 
 class MongoAuthRepository extends AuthRepository{
     async createAuth(authData,session){

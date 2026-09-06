@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs'
 import crypto from "crypto";
 import redisClient from "../../config/redis.config.js";
 import {REDIS_KEYS} from "../../shared/constants/redisKeys.js";
-import {ConflictException, BadRequestException} from "../../shared/errors/domainErrors.js";
+import {ConflictException, BadRequestException, UnauthorizedException} from "../../shared/errors/domainErrors.js";
 import {generateAuthTokens} from "../../shared/utils/jwt.js";
 import {getDeviceInfo} from "../../shared/utils/deviceInfo.js";
 
@@ -90,6 +90,59 @@ class AuthService{
                 id: newUser._id,
                 username: newUser.username,
                 email: newAuth.email
+            },
+            ...token,
+            sessionId
+        };
+    }
+
+    async login({email, password}, userAgent){
+        const normaliseEmail = email.toLowerCase().trim();
+
+        const auth = await this.authRepository.findByEmail(normaliseEmail);
+
+        const invalidCredentials = () =>
+            new UnauthorizedException('Invalid email or password');
+
+
+        if(!auth || auth.provider !== 'local'){
+            throw invalidCredentials();
+        }
+
+        const passwordMatches = await bcrypt.compare(password, auth.hashedPassword);
+
+        if(!passwordMatches){
+            throw invalidCredentials();
+        }
+
+        const user = await this.userRepository.findByAuthId(auth._id);
+        if(!user){
+            throw invalidCredentials();
+        }
+
+        const token = await generateAuthTokens({
+            userId: user._id,
+            authId: auth._id
+        });
+
+        const sessionId = crypto.randomBytes(32).toString('hex');
+        const hashedRefreshToken = await bcrypt.hash(token.refreshToken, 12);
+
+        await this.sessionRepository.createSession({
+            sessionId,
+            userId: user._id,
+            hashedRefreshToken,
+            device: getDeviceInfo(userAgent),
+            isActive: true,
+            lastActive: new Date(),
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        });
+
+        return {
+            user: {
+                id: user._id,
+                username: user.username,
+                email: auth.email
             },
             ...token,
             sessionId
