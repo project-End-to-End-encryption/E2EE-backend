@@ -4,9 +4,9 @@ dotenv.config()
 const minioConfig = {
     endpoint: process.env.MINIO_ENDPOINT,
 
-    port: process.env.MINIO_PORT,
+    port: Number(process.env.MINIO_PORT),
 
-    useSSL: process.env.MINIO_USE_SSL,
+    useSSL: process.env.MINIO_USE_SSL === 'true',
 
     credentials: {
         accessKey: process.env.MINIO_ACCESS_KEY,

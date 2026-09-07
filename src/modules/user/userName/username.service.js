@@ -1,7 +1,8 @@
-import {connectRedis} from '../../config/redis.config.js'
-import {REDIS_KEYS} from "../../shared/constants/redisKeys.js";
-import {ConflictException} from "../../shared/errors/domainErrors.js";
-import userRepository from "../../repositories/interfaces/user.repository.js";
+import redisClient from "../../../config/redis.config.js";
+import {REDIS_KEYS} from "../../../shared/constants/redisKeys.js";
+import {ConflictException} from "../../../shared/errors/domainErrors.js";
+import crypto from 'crypto';
+
 
 class UsernameService{
     constructor(userRepository) {
@@ -16,19 +17,21 @@ class UsernameService{
             throw new ConflictException("Username is already taken");
         }
 
-        const redis = await connectRedis();
-        const lockKey = REDIS_KEYS.usernameLock(normalizedUsername);
+        const redis = redisClient;
 
-        const acquired = await redis.set(lockKey, 'locked', {
+        const reservationId = crypto.randomUUID();
+        const reservationKey = REDIS_KEYS.usernameReservation(reservationId);
+
+        await redis.set(reservationKey, JSON.stringify({
+            username: normalizedUsername
+        }), {
             EX: 900,
             NX: true
         });
 
-        if(!acquired){
-            throw new ConflictException('Username is currently reserved by another user');
-        }
         return {
             username: `@${normalizedUsername}`,
+            reservationId,
             reserved: true,
             expiresInSeconds: 900,
         };

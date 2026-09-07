@@ -16,16 +16,14 @@ const userSchema = new mongoose.Schema({
     },
     fullName: {
         type: String,
-        required: true,
         trim: true,
     },
     userBio:{
         type: String,
         trim: true,
     },
-    profilePictureUrl:{
+    profilePictureKey:{
         type: String,
-        required: true,
         trim: true,
     }
 

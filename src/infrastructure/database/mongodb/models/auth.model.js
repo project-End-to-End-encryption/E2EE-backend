@@ -5,12 +5,17 @@ const authSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        lowercase: true,
         trim: true
     },
     hashedPassword: {
         type: String,
     },
+    provider: {
+        type: String,
+        required: true,
+        enum: ['local', 'google', 'github'],
+        default: 'local'
+    }
 }, {timestamps: true});
 
 const Auth = mongoose.model('Auth', authSchema);
