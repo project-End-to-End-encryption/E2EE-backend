@@ -32,5 +32,5 @@ export const verifyRefreshToken = (token) =>{
 };
 
 export const compareRefreshToken = async (refreshToken, refreshTokenHash) =>{
-    return await bcrypt.compare(refreshToken, refreshTokenHash);
+    return bcrypt.compare(refreshToken, refreshTokenHash);
 };

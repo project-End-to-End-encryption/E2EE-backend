@@ -185,6 +185,14 @@ class AuthService{
             throw new InvalidTokenException('Refresh token reuse detected', 'SESSION_INVALID')
         }
         const user = await this.userRepository.findByAuthId(decoded.authId);
+
+        if (!user) {
+            throw new InvalidTokenException(
+                'User not found',
+                'USER_INVALID'
+            );
+        }
+
         const accessToken = generateAccessToken({userId: user._id, authId: decoded.authId});
 
         return {accessToken};
