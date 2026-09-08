@@ -15,11 +15,11 @@ Promise.all([
     connectToMongoDB(),
     redisClient.connect(),
     storageRepository.init()
-]).then(()=>{
+]).then( async ()=>{
 
-    initWebsocketServer(httpServer);
+    await initWebsocketServer(httpServer);
 
-    app.listen(PORT, ()=>{
+    httpServer.listen(PORT, ()=>{
         console.log(`Server running on port: ${PORT}`)
     });
 }).catch(err => {

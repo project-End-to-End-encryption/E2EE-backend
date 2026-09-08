@@ -1,20 +1,16 @@
-const userSockets = new Map();
+import redisClient from "../../config/redis.config.js";
+import {REDIS_KEYS} from "../../shared/constants/redisKeys.js";
 
-export const addConnection = (userId, socketId) =>{
-    if(!userSockets.has(userId)){
-        userSockets.set(userId, new Set());
-    }
-    userSockets.get(userId).add(socketId);
+export const markOnline = (userId, socketId) =>
+    redisClient.sAdd(REDIS_KEYS.userPresence(userId),socketId);
+
+export const markOffline = async (userId, socketId) =>{
+    const key = REDIS_KEYS.userPresence(userId);
+    await redisClient.sRem(key,socketId);
+    return redisClient.sCard(key);
 }
 
-export const removeConncetion = (userId, socketId) =>{
-    userSockets.get(userId)?.delete(socketId);
+export const isUserOnline = async (userId) =>
+    (await redisClient.sCard(REDIS_KEYS.userPresence(userId))) > 0;
 
-    if(userSockets.get(userId)?.size === 0) {
-        userSockets.delete(userId);
-    }
-}
-
-export const getSocketForUser = (userId) => [
-    ...(userSockets.get(userId) || [])
-];
+// need to add heartbeat

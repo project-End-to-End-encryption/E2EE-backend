@@ -1,11 +1,13 @@
-import {addConnection, removeConncetion} from "../../infrastructure/websocket/connectionManager.js";
+import {
+    markOffline,
+    markOnline
+} from "../../infrastructure/websocket/connectionManager.js";
 
-export const handleConnection = (io, socket) =>{
+export const handleConnection = async (io, socket) =>{
     const {userId} = socket.user;
 
-    addConnection(userId, socket.id);
-    // debug
-    console.log(`Socket connected: user = ${userId} socketId = ${socket.id}`);
+    socket.join(`user:${userId}`); // room membership
+    await markOnline(userId, socket.id);
 
     // all the business logic here
     // register typingEvent
@@ -13,8 +15,11 @@ export const handleConnection = (io, socket) =>{
     // register sessionEvent
     // and more
 
-    socket.on('disconnect', ()=>{
-        removeConncetion(userId, socket.id);
-        console.log(`Socket disconnected: user = ${userId} socket = ${socket.id}`);
+    socket.on('disconnect', async ()=>{
+        const remaining = await markOffline(userId, socket.id);
+
+        if(remaining === 0){
+            // last device gone mark user to offline business logic
+        }
     })
 }
