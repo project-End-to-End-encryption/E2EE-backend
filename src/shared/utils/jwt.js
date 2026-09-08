@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'
 import jwtConfig from "../../config/jwt.config.js";
+import bcrypt from 'bcryptjs'
 
 export const generateAccessToken = (payload)=>{
     return jwt.sign(payload, jwtConfig.accessSecret,{
@@ -28,4 +29,8 @@ export const verifyAccessToken = (token)=>{
 
 export const verifyRefreshToken = (token) =>{
         return jwt.verify(token, jwtConfig.refreshSecret);
+};
+
+export const compareRefreshToken = async (refreshToken, refreshTokenHash) =>{
+    return await bcrypt.compare(refreshToken, refreshTokenHash);
 };

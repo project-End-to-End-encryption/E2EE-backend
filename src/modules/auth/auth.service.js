@@ -3,8 +3,18 @@ import bcrypt from 'bcryptjs'
 import crypto from "crypto";
 import redisClient from "../../config/redis.config.js";
 import {REDIS_KEYS} from "../../shared/constants/redisKeys.js";
-import {ConflictException, BadRequestException, UnauthorizedException} from "../../shared/errors/domainErrors.js";
-import {generateAuthTokens} from "../../shared/utils/jwt.js";
+import {
+    ConflictException,
+    BadRequestException,
+    UnauthorizedException,
+    InvalidTokenException
+} from "../../shared/errors/domainErrors.js";
+import {
+    compareRefreshToken,
+    generateAccessToken,
+    generateAuthTokens,
+    verifyRefreshToken
+} from "../../shared/utils/jwt.js";
 import {getDeviceInfo} from "../../shared/utils/deviceInfo.js";
 
 class AuthService{
@@ -153,6 +163,31 @@ class AuthService{
         if(!sessionId){
             await this.sessionRepository.deleteSession(sessionId);
         }
+    }
+
+    async refreshAccessToken(refreshToken, sessionId){
+        let decoded;
+        try{
+            decoded = verifyRefreshToken(refreshToken);
+        } catch (error){
+            if(error.name === 'TokenExpiredError'){
+                throw new InvalidTokenException('Refresh token has expire', 'REFRESH_TOKEN_EXPIRED');
+            }
+            throw new InvalidTokenException('Invalid refresh token', 'INVALID_REFRESH_TOKEN');
+        }
+
+        const session = await this.sessionRepository.findBySessionId(sessionId);
+        if(!session){
+            throw new InvalidTokenException('Session not found', 'SESSION_INVALID');
+        }
+        const isMatch = await compareRefreshToken(refreshToken, session.hashedRefreshToken);
+        if(!isMatch){
+            throw new InvalidTokenException('Refresh token reuse detected', 'SESSION_INVALID')
+        }
+        const user = await this.userRepository.findByAuthId(decoded.authId);
+        const accessToken = generateAccessToken({userId: user._id, authId: decoded.authId});
+
+        return {accessToken};
     }
 }
 export default AuthService;

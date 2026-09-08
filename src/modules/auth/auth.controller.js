@@ -4,11 +4,21 @@ import MongoAuthRepository from "../../repositories/implementations/mongodb/mong
 import AuthService from "./auth.service.js";
 import {CreateResponse, SuccessResponse} from "../../shared/utils/response.js";
 import MongoSessionRepository from "../../repositories/implementations/mongodb/mongo.session.repository.js";
+import {InvalidTokenException} from "../../shared/errors/domainErrors.js";
 
 const userRepository = new MongoUserRepository();
 const authRepository = new MongoAuthRepository();
 const sessionRepository = new MongoSessionRepository();
 const authService = new AuthService(userRepository,authRepository,sessionRepository);
+
+
+const isProduction = process.env.NODE_ENV === 'prod';
+
+const cookieOption = {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: 'strict',
+};
 
 export const register = asyncHandler(async (req,res) =>{
     const {reservationId, email, password } = req.body;
@@ -21,13 +31,7 @@ export const register = asyncHandler(async (req,res) =>{
             req.headers['user-agent']
         );
 
-    const isProduction = process.env.NODE_ENV === 'prod';
 
-    const cookieOption = {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: 'strict',
-    };
 
     res.cookie('accessToken', accessToken,{
         ...cookieOption,
@@ -64,14 +68,6 @@ export const login = asyncHandler(async (req,res) =>{
     const {user, accessToken, refreshToken, sessionId} =
         await authService.login({email,password},req.headers['user-agent']);
 
-    const isProduction = process.env.NODE_ENV === 'prod';
-
-    const cookieOption = {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: 'strict'
-    }
-
     res.cookie('accessToken', accessToken,{
         ...cookieOption, maxAge: 15 * 60 * 1000,
     });
@@ -99,17 +95,25 @@ export const logout = asyncHandler(async (req,res) =>{
 
     await authService.logout(sessionId);
 
-    const isProduction = process.env.NODE_ENV === 'prod';
-
-    const cookieOption = {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: 'strict'
-    };
-
     res.clearCookie('accessToken', cookieOption);
     res.clearCookie('refreshToken', cookieOption);
     res.clearCookie('sessionId', cookieOption);
 
     res.status(200).json(new SuccessResponse('Logged out successfully', null));
 });
+
+export const refreshToken = asyncHandler(async (req,res) => {
+    const {refreshToken, sessionId} = req.cookies;
+
+    if(!refreshToken || !sessionId){
+        throw new InvalidTokenException('Refresh token required', 'REFRESH_TOKEN_REQUIRED');
+    }
+
+    const {accessToken} = await authService.refreshAccessToken(refreshToken,sessionId);
+
+    res.cookie('accessToken', accessToken, {...cookieOption, maxAge: 15 * 60 * 1000});
+
+    res.status(200).json(new SuccessResponse('Access token refresh', null));
+})
+
+// cookie path set up will be done later
