@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 import jwtConfig from "../../config/jwt.config.js";
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcrypt'
 
 export const generateAccessToken = (payload)=>{
     return jwt.sign(payload, jwtConfig.accessSecret,{

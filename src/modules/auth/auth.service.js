@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcrypt'
 import crypto from "crypto";
 import redisClient from "../../config/redis.config.js";
 import {REDIS_KEYS} from "../../shared/constants/redisKeys.js";
