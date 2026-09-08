@@ -37,7 +37,7 @@ class MinioStorageRepository extends StorageRepository{
     async uploadProfilePicture(fileBuffer, originalName, mimetype){
         return this.#put(
             this.buckets.profileAssets,
-            'profile',
+            'profilePicture',
             fileBuffer,
             originalName,
             mimetype
@@ -79,7 +79,7 @@ class MinioStorageRepository extends StorageRepository{
 
     generateProfilePictureKey(originalName) {
         const ext = path.extname(originalName || '').toLowerCase();
-        return `profile/${randomUUID()}${ext}`;
+        return `profilePicture/${randomUUID()}${ext}`;
     }
 }
 

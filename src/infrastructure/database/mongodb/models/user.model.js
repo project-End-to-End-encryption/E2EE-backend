@@ -25,6 +25,12 @@ const userSchema = new mongoose.Schema({
     profilePictureKey:{
         type: String,
         trim: true,
+    },
+    accountStatus:{
+        type: String,
+        required: true,
+        enum: ['active', 'in-active', 'blocked'],
+        default: 'in-active'
     }
 
 },{timestamps:true});
