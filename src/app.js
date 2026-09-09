@@ -4,7 +4,18 @@ import {globalErrorHandler} from "./middleware/error.middleware.js";
 import routes from "./routes/index.js";
 import cookieParser from 'cookie-parser'
 import {BadRequestException} from "./shared/errors/domainErrors.js";
+import cors from 'cors';
+
 const app = express();
+
+const corsOptions = {
+    origin: "http://localhost:5173", // Replace with your frontend URL/port
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(cookieParser());

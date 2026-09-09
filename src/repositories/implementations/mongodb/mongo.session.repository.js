@@ -30,7 +30,7 @@ class MongoSessionRepository extends SessionRepository{
         return await Session.findOneAndUpdate(
             { sessionId },
             { lastActive },
-            { new: true, runValidators: true }
+            { returnDocument: 'after', runValidators: true }
         );
     }
 
@@ -38,7 +38,7 @@ class MongoSessionRepository extends SessionRepository{
         return await Session.findOneAndUpdate(
             { sessionId },
             { hashedRefreshToken },
-            { new: true, runValidators: true }
+            { returnDocument: 'after', runValidators: true }
         );
     }
 
@@ -49,7 +49,7 @@ class MongoSessionRepository extends SessionRepository{
                 isActive: false,
                 revokedAt: new Date()
             },
-            { new: true, runValidators: true }
+            { returnDocument: 'after', runValidators: true }
         );
     }
 
@@ -71,7 +71,7 @@ class MongoSessionRepository extends SessionRepository{
         return await Session.findOneAndUpdate(
             {sessionId},
             {activeTabId: tabId},
-            {new: true, runValidators: true}
+            { returnDocument: 'after', runValidators: true}
         );
     }
 }
