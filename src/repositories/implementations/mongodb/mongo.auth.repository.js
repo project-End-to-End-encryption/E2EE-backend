@@ -15,7 +15,7 @@ class MongoAuthRepository extends AuthRepository{
     }
     async updatePassword(authId, hashedPassword){
         return await Auth.findByIdAndUpdate(
-            authId, {hashedPassword}, {new: true, runValidators:true}
+            authId, {hashedPassword}, {returnDocument: 'after', runValidators:true}
         )
     }
     async deleteAuth(authId){

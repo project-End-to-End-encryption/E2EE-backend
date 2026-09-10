@@ -17,7 +17,7 @@ class MongoUserRepository extends UserRepository {
     }
     async updateUser(userId, updateData){
         return await User.findByIdAndUpdate(
-            userId,updateData,{new: true, runValidators: true}
+            userId,updateData,{returnDocument: 'after', runValidators: true}
         );
     }
     async deleteUser(userId){
