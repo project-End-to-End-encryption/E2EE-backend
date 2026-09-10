@@ -16,8 +16,8 @@ const isProduction = process.env.NODE_ENV === 'prod';
 
 const cookieOption = {
     httpOnly: true,
-    secure: isProduction,
-    sameSite: 'strict',
+    secure: true,
+    sameSite: 'none',
 };
 
 export const register = asyncHandler(async (req,res) =>{
