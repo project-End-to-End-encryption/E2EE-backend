@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import http from 'http';
+import https from 'https';
 import connectToMongoDB from './config/mongo.config.js';
 import redisClient from "./config/redis.config.js";
 import app from './app.js'
@@ -15,7 +15,7 @@ const options = {
     cert: fs.readFileSync('/etc/ssl/tailscale/ubcli.tail2786c2.ts.net.crt'),
 };
 
-const httpServer = http.createServer(options, app);
+const httpServer = https.createServer(options, app);
 
 Promise.all([
     connectToMongoDB(),
