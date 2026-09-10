@@ -51,13 +51,7 @@ export const register = asyncHandler(async (req,res) =>{
     res.status(201).json(
         new CreateResponse(
             'Account created successfully',
-            {
-                debugTokens:{
-                    accessToken: accessToken,
-                    refreshToken: refreshToken,
-                    sessionId: sessionId
-                }
-            }
+            null
         )
     );
 });
