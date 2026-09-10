@@ -9,7 +9,7 @@ import cors from 'cors';
 const app = express();
 
 const corsOptions = {
-    origin: "http://localhost:5173", // Replace with your frontend URL/port
+    origin: process.env.CLIENT_URL,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
