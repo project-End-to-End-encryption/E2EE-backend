@@ -25,8 +25,8 @@ class AuthService{
     }
     async register({reservationId, email, password}, userAgent){
         const redis = redisClient
-        const reservationKey = REDIS_KEYS.usernameReservation(reservationId)
-        const reservationData = await redis.get(reservationKey);
+        const idKey = REDIS_KEYS.usernameReservationById(reservationId);
+        const reservationData = await redis.get(idKey);
 
         if (!reservationData) {
             throw new BadRequestException(
@@ -71,7 +71,8 @@ class AuthService{
         } finally {
             await session.endSession()
         }
-        await redis.del(reservationKey);
+        await redis.del(idKey);
+        await redis.del(REDIS_KEYS.usernameReservation(username));
         const token =  await generateAuthTokens({
             userId: newUser._id,
             authId: newAuth._id,
@@ -160,7 +161,7 @@ class AuthService{
     }
 
     async logout(sessionId){
-        if(!sessionId){
+        if(sessionId){
             await this.sessionRepository.deleteSession(sessionId);
         }
     }

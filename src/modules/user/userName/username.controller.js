@@ -15,7 +15,7 @@ export const checkUsername = asyncHandler(async (req,res) => {
 
     res.status(200).json(
         new SuccessResponse(
-            'Username is available and reserved for 15 minutes',
+            'Username is available',
             result
         )
     )

@@ -20,13 +20,30 @@ class UsernameService{
         const redis = redisClient;
 
         const reservationId = crypto.randomUUID();
-        const reservationKey = REDIS_KEYS.usernameReservation(reservationId);
 
-        await redis.set(reservationKey, JSON.stringify({
+        const lockKey = REDIS_KEYS.usernameReservation(normalizedUsername);
+        const idKey = REDIS_KEYS.usernameReservationById(reservationId);
+
+
+        const acquired = await redis.set(lockKey, JSON.stringify({
+            reservationId,
             username: normalizedUsername
         }), {
             EX: 900,
             NX: true
+        });
+
+
+        if (acquired === null) {
+            // someone already holds an active reservation on this username
+            throw new ConflictException("Username is currently reserved, try again in a few minutes");
+        }
+
+
+        await redis.set(idKey, JSON.stringify({
+            username: normalizedUsername
+        }), {
+            EX: 900
         });
 
         return {
