@@ -17,34 +17,61 @@ class UsernameService{
             throw new ConflictException("Username is already taken");
         }
 
-        const redis = redisClient;
-
         const reservationId = crypto.randomUUID();
 
         const lockKey = REDIS_KEYS.usernameReservation(normalizedUsername);
         const idKey = REDIS_KEYS.usernameReservationById(reservationId);
 
-
-        const acquired = await redis.set(lockKey, JSON.stringify({
+        const reservationData = JSON.stringify({
             reservationId,
             username: normalizedUsername
-        }), {
-            EX: 900,
-            NX: true
+        });
+
+        const idData = JSON.stringify({
+            username: normalizedUsername
         });
 
 
-        if (acquired === null) {
+        // Lua script to prevent race condition
+        const script = `
+        if redis.call("EXISTS", KEYS[1]) == 1 then
+            return 0
+        end
+
+        redis.call(
+            "SET",
+            KEYS[1],
+            ARGV[1],
+            "EX",
+            ARGV[3]
+        )
+
+        redis.call(
+            "SET",
+            KEYS[2],
+            ARGV[2],
+            "EX",
+            ARGV[3]
+        )
+
+        return 1
+    `;
+
+        const result = await redisClient.eval(script, {
+            keys: [lockKey, idKey],
+            arguments: [
+                reservationData,
+                idData,
+                "900"
+            ]
+        });
+
+
+        if (result === 0) {
             // someone already holds an active reservation on this username
             throw new ConflictException("Username is currently reserved, try again in a few minutes");
         }
 
-
-        await redis.set(idKey, JSON.stringify({
-            username: normalizedUsername
-        }), {
-            EX: 900
-        });
 
         return {
             username: `@${normalizedUsername}`,

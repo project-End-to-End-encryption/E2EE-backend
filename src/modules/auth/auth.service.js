@@ -35,6 +35,25 @@ class AuthService{
         }
         const { username } = JSON.parse(reservationData);
 
+        const lockKey = REDIS_KEYS.usernameReservation(username);
+
+        const lockData = await redis.get(lockKey);
+
+        if (!lockData) {
+            throw new BadRequestException(
+                "Username reservation is invalid or has expired"
+            );
+        }
+
+        const lock = JSON.parse(lockData);
+
+        if (lock.reservationId !== reservationId) {
+            throw new BadRequestException(
+                "Username reservation is no longer valid"
+            );
+        }
+
+
         const existingUser = await this.userRepository.findByUsername(username);
 
         if(existingUser){
@@ -71,8 +90,7 @@ class AuthService{
         } finally {
             await session.endSession()
         }
-        await redis.del(idKey);
-        await redis.del(REDIS_KEYS.usernameReservation(username));
+        await redis.multi().del(idKey).del(REDIS_KEYS.usernameReservation(username)).exec();
         const token =  await generateAuthTokens({
             userId: newUser._id,
             authId: newAuth._id,
