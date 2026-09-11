@@ -31,6 +31,8 @@
     "nodemon": "^3.1.14",
     "redis": "^6.2.1",
     "socket.io": "^4.8.3",
+    "tweetnacl": "^1.0.3",
+    "tweetnacl-util": "^0.15.1",
     "ua-parser-js": "^2.0.10"
   }
 }

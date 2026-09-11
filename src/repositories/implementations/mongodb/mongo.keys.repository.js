@@ -6,7 +6,7 @@ class KeyBundleRepository extends IkeyBundleRepository{
         return KeyBundleModel.findOneAndUpdate(
             {userId: data.userId},
             {$set: data},
-            {upsert: true, returnDocument: 'after'}
+            {upsert: true, returnDocument: 'after', runValidators: true}
         );
     }
     async findByUserId(userId){
@@ -15,7 +15,7 @@ class KeyBundleRepository extends IkeyBundleRepository{
     async addOneTimePreKeys(userId, keys){
         return KeyBundleModel.updateOne(
             {userId},
-            {$push: {oneTimePreKeys: {$each: keys}}}
+            {$push: {oneTimePreKeys: {$each: keys}}},{runValidators: true}
         );
     }
     async popOneTimePreKey(userId) {
@@ -53,4 +53,4 @@ class KeyBundleRepository extends IkeyBundleRepository{
     }
 }
 
-export default new IkeyBundleRepository();
+export default KeyBundleRepository;

@@ -30,3 +30,9 @@ export class InvalidTokenException extends AppError {
         super(message, 401, errorCode);
     }
 }
+
+export class CryptoKeyException extends AppError {
+    constructor(message = 'Required cryptographic key is missing', errorCode = 'CRYPTO_KEY_REQUIRED') {
+        super(message, 400, errorCode);
+    }
+}
