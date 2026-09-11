@@ -4,12 +4,18 @@ import {verifyAccessToken} from "../../shared/utils/jwt.js";
 export const authenticateSocket = (socket, next) => {
     try{
         const cookies = cookie.parse(socket.handshake.headers.cookie || '');
+        const token = cookies.accessToken || socket.handshake.auth?.token;
 
-        if(!cookies.accessToken){
+        // if(!cookies.accessToken){
+        //     return next(new Error('TOKEN_REQUIRED'));
+        // }
+
+        if(!token){
             return next(new Error('TOKEN_REQUIRED'));
         }
 
-        socket.user = verifyAccessToken(cookies.accessToken);
+
+        socket.user = verifyAccessToken(token);
 
         next();
     } catch (error){
