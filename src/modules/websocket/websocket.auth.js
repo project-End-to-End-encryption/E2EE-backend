@@ -6,14 +6,9 @@ export const authenticateSocket = (socket, next) => {
         const cookies = cookie.parse(socket.handshake.headers.cookie || '');
         const token = cookies.accessToken || socket.handshake.auth?.token;
 
-        // if(!cookies.accessToken){
-        //     return next(new Error('TOKEN_REQUIRED'));
-        // }
-
         if(!token){
             return next(new Error('TOKEN_REQUIRED'));
         }
-
 
         socket.user = verifyAccessToken(token);
 
