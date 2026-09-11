@@ -53,4 +53,4 @@ class KeyBundleRepository extends IkeyBundleRepository{
     }
 }
 
-export default KeyBundleRepository;
+export default new KeyBundleRepository;

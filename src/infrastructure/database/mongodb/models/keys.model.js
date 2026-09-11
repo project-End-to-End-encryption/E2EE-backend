@@ -14,7 +14,6 @@ const keyBundleSchema = new mongoose.Schema({
     userId: {
         type: String,
         required: true,
-        unique: true,
         index: true
     },
     deviceId: {

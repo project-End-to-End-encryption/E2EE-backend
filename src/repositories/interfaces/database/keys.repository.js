@@ -5,13 +5,13 @@ class IkeyBundleRepository {
     async findByUserId(userId){
         throw new Error("Method not implemented.");
     }
-    async addOneTimePreKeys(userId, keys){
+    async addOneTimePreKeys(userId, deviceId,  keys){
         throw new Error("Method not implemented.");
     }
-    async popOneTimePreKey(userId){
+    async popOneTimePreKey(userId, deviceId){
         throw new Error("Method not implemented.");
     }
-    async countOneTimePreKeys(userId){
+    async countOneTimePreKeys(userId, deviceId){
         throw new Error("Method not implemented.");
     }
 }
