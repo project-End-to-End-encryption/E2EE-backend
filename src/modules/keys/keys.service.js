@@ -4,9 +4,9 @@ import {CryptoKeyException} from "../../shared/errors/domainErrors.js";
 
 
 export const registerKeyBundle = async (userId, payload) => {
-    const { identityPublicKey, signedPreKey, signedPreKeySignature, oneTimePreKeys } = payload;
+    const { deviceId, identityPublicKey, signedPreKey, signedPreKeySignature, oneTimePreKeys } = payload;
 
-    if(!identityPublicKey || !signedPreKey?.keyId || !signedPreKey?.publicKey  || !signedPreKeySignature){
+    if(!deviceId || !identityPublicKey || !signedPreKey?.keyId || !signedPreKey?.publicKey  || !signedPreKeySignature){
         throw new CryptoKeyException('Invalid key bundle', 'CRYPTO_KEY_REQUIRED')
     }
 
@@ -17,6 +17,7 @@ export const registerKeyBundle = async (userId, payload) => {
 
     return KeyBundleRepository.upsert({
         userId,
+        deviceId,
         identityPublicKey,
         signedPreKey,
         signedPreKeySignature,

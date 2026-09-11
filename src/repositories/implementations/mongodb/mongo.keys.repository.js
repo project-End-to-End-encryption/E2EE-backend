@@ -4,24 +4,24 @@ import IkeyBundleRepository from "../../interfaces/database/keys.repository.js";
 class KeyBundleRepository extends IkeyBundleRepository{
     async upsert(data){
         return KeyBundleModel.findOneAndUpdate(
-            {userId: data.userId},
+            {userId: data.userId, deviceId: data.deviceId},
             {$set: data},
             {upsert: true, returnDocument: 'after', runValidators: true}
         );
     }
     async findByUserId(userId){
-        return KeyBundleModel.findOne({userId}).lean();
+        return KeyBundleModel.find({userId}).lean();
     }
-    async addOneTimePreKeys(userId, keys){
+    async addOneTimePreKeys(userId, deviceId, keys){
         return KeyBundleModel.updateOne(
-            {userId},
+            {userId, deviceId},
             {$push: {oneTimePreKeys: {$each: keys}}},{runValidators: true}
         );
     }
-    async popOneTimePreKey(userId) {
+    async popOneTimePreKey(userId,deviceId) {
         const doc = await KeyBundleModel.findOneAndUpdate(
             {
-                userId,
+                userId, deviceId,
                 oneTimePreKeys: {
                     $exists: true,
                     $ne: []
@@ -43,9 +43,9 @@ class KeyBundleRepository extends IkeyBundleRepository{
 
         return doc.oneTimePreKeys[0];
     }
-    async countOneTimePreKeys(userId){
+    async countOneTimePreKeys(userId, deviceId){
         const doc = await KeyBundleModel.findOne(
-            {userId},
+            {userId, deviceId},
             {oneTimePreKeys: 1}
         ).lean();
 

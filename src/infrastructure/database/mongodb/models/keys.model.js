@@ -17,6 +17,10 @@ const keyBundleSchema = new mongoose.Schema({
         unique: true,
         index: true
     },
+    deviceId: {
+      type: String,
+      required: true
+    },
     identityPublicKey: {
         type: String,
         required: true
