@@ -76,10 +76,9 @@ export const login = asyncHandler(async (req,res) =>{
     });
 
     res.status(200).json(
-        new SuccessResponse('Logged in successfully',{
-            debugTokens: {
-               userId: user.id
-            }
+        new SuccessResponse('Logged in successfully',
+            {
+                userId: user.id
         })
     );
 })
