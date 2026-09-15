@@ -14,6 +14,9 @@ class IkeyBundleRepository {
     async countOneTimePreKeys(userId, deviceId){
         throw new Error("Method not implemented.");
     }
+    async findDevice(userId, deviceId){
+        throw new Error("Method not implemented.");
+    }
 }
 
 export default IkeyBundleRepository;

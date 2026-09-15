@@ -51,6 +51,9 @@ class KeyBundleRepository extends IkeyBundleRepository{
 
         return doc?.oneTimePreKeys?.length ?? 0;
     }
+    async findDevice(userId, deviceId){
+        return KeyBundleModel.findOne({userId, deviceId}, {oneTimePreKeys: 0}).lean();
+    }
 }
 
 export default new KeyBundleRepository;

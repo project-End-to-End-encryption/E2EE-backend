@@ -10,7 +10,12 @@ export const authenticateSocket = (socket, next) => {
             return next(new Error('TOKEN_REQUIRED'));
         }
 
-        socket.user = verifyAccessToken(token);
+        const decoded = verifyAccessToken(token);
+
+        socket.user = {
+            userId: decoded.sub,
+            deviceId: socket.handshake.auth?.deviceId
+        };
 
         next();
     } catch (error){
