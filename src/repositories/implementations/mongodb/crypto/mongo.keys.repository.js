@@ -1,5 +1,5 @@
-import {KeyBundleModel} from "../../../infrastructure/database/mongodb/models/keys.model.js";
-import IkeyBundleRepository from "../../interfaces/database/keys.repository.js";
+import {KeyBundleModel} from "../../../../infrastructure/database/mongodb/models/keys.model.js";
+import IkeyBundleRepository from "../../../interfaces/database/crypto/keys.repository.js";
 
 class KeyBundleRepository extends IkeyBundleRepository{
     async upsert(data){

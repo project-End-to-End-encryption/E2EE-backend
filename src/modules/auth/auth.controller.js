@@ -1,9 +1,9 @@
 import {asyncHandler} from "../../shared/utils/asyncHandler.js";
-import MongoUserRepository from "../../repositories/implementations/mongodb/mongo.user.repository.js";
-import MongoAuthRepository from "../../repositories/implementations/mongodb/mongo.auth.repository.js";
+import MongoUserRepository from "../../repositories/implementations/mongodb/user/mongo.user.repository.js";
+import MongoAuthRepository from "../../repositories/implementations/mongodb/auth/mongo.auth.repository.js";
 import AuthService from "./auth.service.js";
 import {CreateResponse, SuccessResponse} from "../../shared/utils/response.js";
-import MongoSessionRepository from "../../repositories/implementations/mongodb/mongo.session.repository.js";
+import MongoSessionRepository from "../../repositories/implementations/mongodb/auth/mongo.session.repository.js";
 import {InvalidTokenException} from "../../shared/errors/domainErrors.js";
 
 const userRepository = new MongoUserRepository();

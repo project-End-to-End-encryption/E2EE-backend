@@ -1,4 +1,4 @@
-import GroupRepository from "../../repositories/implementations/mongodb/mongo.group.repository.js";
+import GroupRepository from "../../repositories/implementations/mongodb/group/mongo.group.repository.js";
 import { listUserDevice } from '../keys/keys.service.js'
 
 export const createGroup = async (creatorUserId, {name, memberUserIds = []}) =>{

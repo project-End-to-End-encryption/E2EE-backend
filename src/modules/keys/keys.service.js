@@ -1,4 +1,4 @@
-import KeyBundleRepository from "../../repositories/implementations/mongodb/mongo.keys.repository.js";
+import KeyBundleRepository from "../../repositories/implementations/mongodb/crypto/mongo.keys.repository.js";
 import {verifySignature} from "../../shared/utils/crypto.js";
 import {CryptoKeyException} from "../../shared/errors/domainErrors.js";
 

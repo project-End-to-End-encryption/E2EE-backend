@@ -1,5 +1,5 @@
-import {User} from '../../../infrastructure/database/mongodb/models/user.model.js';
-import UserRepository from '../../interfaces/database/user.repository.js';
+import {User} from '../../../../infrastructure/database/mongodb/models/user.model.js';
+import UserRepository from '../../../interfaces/database/user/user.repository.js';
 
 class MongoUserRepository extends UserRepository {
     async createUser(userData,session) {

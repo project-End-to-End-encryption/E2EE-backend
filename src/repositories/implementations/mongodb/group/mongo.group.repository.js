@@ -1,5 +1,5 @@
-import { GroupModel } from '../../../infrastructure/database/mongodb/models/group.model.js'
-import IGroupRepository from "../../interfaces/database/group.repository.js";
+import { GroupModel } from '../../../../infrastructure/database/mongodb/models/group.model.js'
+import IGroupRepository from "../../../interfaces/database/group/group.repository.js";
 
 class GroupRepository extends IGroupRepository{
     async create(data){

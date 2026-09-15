@@ -1,5 +1,5 @@
 import {asyncHandler} from "../../../shared/utils/asyncHandler.js";
-import MongoUserRepository from "../../../repositories/implementations/mongodb/mongo.user.repository.js";
+import MongoUserRepository from "../../../repositories/implementations/mongodb/user/mongo.user.repository.js";
 import MinioStorageRepository from "../../../repositories/implementations/minio/minio.storage.repository.js";
 import ProfileService from "./profile.service.js";
 import {SuccessResponse} from "../../../shared/utils/response.js";
