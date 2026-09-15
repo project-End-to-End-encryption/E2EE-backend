@@ -7,7 +7,7 @@ export const REDIS_KEYS = {
     // deliver now or queue will de decided here only
     devicePresence: (userId) => `presence:devices:${userId}`,
 
-    // sliding-window counter for rate limiting
+    // fixed-window counter for rate limiting
     rateLimit: (bucket, id) => `rl:${bucket}:${id}`,
 
     // Short-lived cache of conversation membership
