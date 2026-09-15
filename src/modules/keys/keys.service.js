@@ -4,6 +4,7 @@ import {CryptoKeyException} from "../../shared/errors/domainErrors.js";
 
 
 export const registerKeyBundle = async (userId, deviceId, payload) => {
+    if (!userId) throw new CryptoKeyException('Missing userId', 'CRYPTO_KEY_REQUIRED');
     const { identityPublicKey, signedPreKey, signedPreKeySignature, oneTimePreKeys } = payload;
 
     if(!deviceId || !identityPublicKey || !signedPreKey?.keyId || !signedPreKey?.publicKey  || !signedPreKeySignature){

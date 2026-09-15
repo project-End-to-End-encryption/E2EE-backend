@@ -14,7 +14,6 @@ const keyBundleSchema = new mongoose.Schema({
     userId: {
         type: String,
         required: true,
-        index: true
     },
     deviceId: {
       type: String,
@@ -43,6 +42,8 @@ const keyBundleSchema = new mongoose.Schema({
         default: []
     }
 }, {timestamps: true});
+
+keyBundleSchema.index({userId: 1, deviceId: 1}, {unique: true});
 
 const KeyBundleModel =  mongoose.model('KeyBundle', keyBundleSchema);
 
