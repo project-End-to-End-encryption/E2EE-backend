@@ -1,11 +1,9 @@
 import {
     markOffline,
     markOnline,
-    joinRoom
 } from "../../infrastructure/websocket/connectionManager.js";
 import {registerKeyEvent} from "./events/keys.event.js";
 import {registerAiEvent} from "./events/ai.event.js";
-import {registerGroupEvent} from "./events/group.event.js";
 import {registerMessageEvents} from "./events/message.event.js";
 import {deviceRoom, userRoom} from "../../shared/utils/socketRooms.js";
 
@@ -24,7 +22,6 @@ export const handleConnection = async (io, socket) =>{
         registerAiEvent(io, socket);
         registerKeyEvent(io, socket);
         registerMessageEvents(io, socket);
-        registerGroupEvent(io, socket);
         // all the business logic here
         // register typingEvent
         // register messageEvent
