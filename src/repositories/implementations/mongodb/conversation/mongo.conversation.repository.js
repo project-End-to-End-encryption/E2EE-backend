@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 import {ConversationModel, buildDirectKey} from "../../../../infrastructure/database/mongodb/models/conversation.model.js";
-import IConversationKeyRepository from "../../../interfaces/database/conversation/conversationKey.repository.js";
+import IConversationRepository from "../../../interfaces/database/conversation/conversation.repository.js";
 const toId = (value) => (value ? String(value) : value);
 
-class MongoConversationRepository extends IConversationKeyRepository{
+class MongoConversationRepository extends IConversationRepository{
 
     async createGroup({name, createdBy, memberIds, avatarKey = null}){
         const unique = Array.from(new Set([toId(createdBy), ...memberIds.map(toId)]));
