@@ -3,7 +3,11 @@ import jwtConfig from "../../config/jwt.config.js";
 import bcrypt from 'bcrypt'
 
 export const generateAccessToken = (payload)=>{
-    return jwt.sign(payload, jwtConfig.accessSecret,{
+    const fullPayload = {
+        ...payload,
+        sub: payload.userId || payload.sub
+    }
+    return jwt.sign(fullPayload, jwtConfig.accessSecret,{
         expiresIn: jwtConfig.accessTokenExpiry,
         algorithm: jwtConfig.algorithm
     });

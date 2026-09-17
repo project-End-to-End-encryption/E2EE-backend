@@ -12,8 +12,10 @@ export const authenticateSocket = (socket, next) => {
 
         const decoded = verifyAccessToken(token);
 
+        const userId = decoded.userId || decoded.sub;
+
         socket.user = {
-            userId: decoded.sub,
+            userId,
             deviceId: socket.handshake.auth?.deviceId
         };
 
