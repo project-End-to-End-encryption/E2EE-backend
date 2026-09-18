@@ -1,6 +1,7 @@
 import {
     markOffline,
     markOnline,
+    joinRoom
 } from "../../infrastructure/websocket/connectionManager.js";
 import {registerKeyEvent} from "./events/keys.event.js";
 import {registerAiEvent} from "./events/ai.event.js";
@@ -12,15 +13,13 @@ export const handleConnection = async (io, socket) =>{
     const {userId, deviceId} = socket.user;
 
     try {
-        socket.join(userRoom(userId));
-        if (deviceId) {
-            socket.join(deviceRoom(deviceId))
-        }
-        await markOnline(userId, socket.id);
         await joinRoom(socket);
+        await markOnline(userId, deviceId, socket.id);
 
-        registerAiEvent(io, socket);
+
+
         registerKeyEvent(io, socket);
+
         registerMessageEvents(io, socket);
         // all the business logic here
         // register typingEvent
