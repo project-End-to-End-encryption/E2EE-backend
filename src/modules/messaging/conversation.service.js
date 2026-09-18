@@ -64,8 +64,10 @@ export const openDirectConversation = async (userId, peerUserId) => {
     return conversation;
 };
 
-export const createGroupConversation = async
-    (creatorUserId, {name, memberUserIds = [], avatarKey = null }) => {
+export const createGroupConversation = async (
+    creatorUserId,
+    { name, memberUserIds = [], avatarKey = null }
+) => {
 
     if(!name || !name.trim()) throw new MessagingException('Group name required', 'INVALID_PAYLOAD');
 

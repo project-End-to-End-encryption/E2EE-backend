@@ -1,7 +1,7 @@
 import {
     markOffline,
     markOnline,
-    joinRoom
+    joinRooms
 } from "../../infrastructure/websocket/connectionManager.js";
 import {registerKeyEvent} from "./events/keys.event.js";
 import {registerAiEvent} from "./events/ai.event.js";
@@ -13,7 +13,7 @@ export const handleConnection = async (io, socket) =>{
     const {userId, deviceId} = socket.user;
 
     try {
-        await joinRoom(socket);
+        await joinRooms(socket);
         await markOnline(userId, deviceId, socket.id);
 
 
