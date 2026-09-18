@@ -11,11 +11,15 @@ export const REDIS_KEYS = {
     rateLimit: (bucket, id) => `rl:${bucket}:${id}`,
 
     // Short-lived cache of conversation membership
-    conversationMembers: (conversationId) => `conv:members:${conversationId}`
+    conversationMembers: (conversationId) => `conv:members:${conversationId}`,
 
+    // sidebar revision
+    sidebarRev: (userId) => `sidebar:rev:${userId}`
 };
 
 export const REDIS_TTL = {
     conversationMembers: 300,   // 5 minutes
-    devicePresence: 3600 // refreshed on every connect
+    devicePresence: 3600, // refreshed on every connect
+
+    sidebarRev: 60 * 60 * 24 * 30
 }

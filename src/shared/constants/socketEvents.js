@@ -1,11 +1,12 @@
 export const SOCKET_EVENTS = {
 
 
-    // keys / pre-key bundles    KEYS_REGISTER: 'keys:register',
+    // keys / pre-key bundles
+     KEYS_REGISTER: 'keys:register',
     KEYS_FETCH_BUNDLE: 'keys:fetchBundle',
     KEYS_COUNT_OTPK: 'keys:countOneTimePreKeys',
     KEYS_TOP_UP_OTPK: 'keys:topUpOneTimePreKeys',
-    KEYS_REGISTER: 'keys:register',
+
 
     // conservation
 
@@ -18,8 +19,19 @@ export const SOCKET_EVENTS = {
     CONVERSATION_PUT_KEY: 'conversation:putArchiveKey',
     CONVERSATION_GET_KEY: 'conversation:getArchiveKey',
     CONVERSATION_LIST_KEYS: 'conversation:listArchiveKeys',
+    CONVERSATION_SET_FLAGS: 'conversation:setFlags',
+    CONVERSATION_CLEAR: 'conversation:clear',
     CONVERSATION_CREATED: 'conversation:created',
     CONVERSATION_UPDATED: 'conversation:updated',
+
+    // sideBar sync
+    SIDEBAR_SYNC: 'sidebar:sync',
+    SIDEBAR_PATCH: 'sidebar:patch',
+
+    // chat history
+
+    HISTORY_PAGE: 'history:page',
+    HISTORY_RANGE: 'history:range',
 
     // messaging
 
@@ -40,8 +52,10 @@ export const SOCKET_EVENTS = {
 
     // calls for v2
 
-    CALL_SIGNAL: 'call:signal',
     CALL_INVITE: 'call:invite',
+    CALL_ACCEPT: 'call:accept',
+    CALL_REJECT: 'call:reject',
+    CALL_SIGNAL: 'call:signal',   // SDP offer/answer + ICE candidates
     CALL_END: 'call:end'
 
 }
