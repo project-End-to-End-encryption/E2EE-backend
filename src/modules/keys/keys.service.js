@@ -17,7 +17,7 @@ export const registerKeyBundle = async (userId, deviceId, payload) => {
     }
 
     return KeyBundleRepository.upsert({
-        userId,
+        userId: String(userId),
         deviceId,
         identityPublicKey,
         signedPreKey,
@@ -43,4 +43,20 @@ export const getPreKeyBundle = async (userId, deviceId) =>{
 export const listUserDevice = async (userId) => {
     const device = await KeyBundleRepository.findByUserId(userId);
     return device.map(d => ({userId, deviceId: d.deviceId}));
+}
+
+export const countOneTimePreKeys = (userId, deviceId) =>
+    KeyBundleRepository.countOneTimePreKeys(userId, deviceId);
+
+export const addOneTimePreKeys = async (userId, deviceId, keys) => {
+    if (!Array.isArray(keys) || !keys.length) {
+        throw new CryptoKeyException('No prekeys supplied', 'INVALID_PAYLOAD');
+    }
+
+    const current = await KeyBundleRepository.countOneTimePreKeys(userId, deviceId);
+
+    if(current + keys.length > 200) {
+        throw new CryptoKeyException('Prekey store full', 'PREKEY_LIMIT');
+    }
+    return KeyBundleRepository.addOneTimePreKeys(userId, deviceId, keys);
 }

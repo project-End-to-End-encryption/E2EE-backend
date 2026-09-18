@@ -5,6 +5,7 @@ export const SOCKET_EVENTS = {
     KEYS_FETCH_BUNDLE: 'keys:fetchBundle',
     KEYS_COUNT_OTPK: 'keys:countOneTimePreKeys',
     KEYS_TOP_UP_OTPK: 'keys:topUpOneTimePreKeys',
+    KEYS_REGISTER: 'keys:register',
 
     // conservation
 
