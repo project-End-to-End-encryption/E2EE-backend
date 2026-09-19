@@ -19,6 +19,8 @@ import {MessagingException, ForbiddenException, NotFoundException} from "../../s
 
 const MAX_CIPHERTEXT_BYTES = 128 * 1024;   // ~96 KB of plaintext after base64
 const MAX_ENVELOPES_PER_SEND = 512;        // fan-out ceiling per message
+const MAX_ATTACHMENTS_PER_MESSAGE = 10;
+const ATTACHMENT_CATEGORIES = new Set(['image', 'video', 'audio', 'file']);
 
 /**
  * Device presence
@@ -53,6 +55,32 @@ const assertSendPayload = (payload) => {
 
     if (payload.envelopes?.length > MAX_ENVELOPES_PER_SEND) {
         throw new MessagingException('Too many recipient devices', 'FANOUT_TOO_LARGE');
+    }
+
+    assertAttachments(payload.attachments, conversationId);
+}
+
+
+const assertAttachments = (attachments, conversationId) => {
+    if (attachments === undefined || attachments === null) return;
+
+    if (!Array.isArray(attachments)) {
+        throw new MessagingException('attachments must be an array', 'INVALID_PAYLOAD');
+    }
+    if (attachments.length > MAX_ATTACHMENTS_PER_MESSAGE) {
+        throw new MessagingException('Too many attachments', 'INVALID_MEDIA');
+    }
+
+    for (const attachment of attachments) {
+        if (!attachment?.attachmentId || !attachment?.storageKey) {
+            throw new MessagingException('Malformed attachment', 'INVALID_MEDIA');
+        }
+        if (!ATTACHMENT_CATEGORIES.has(attachment.category)) {
+            throw new MessagingException('Unsupported media category', 'UNSUPPORTED_MEDIA');
+        }
+        if (!String(attachment.storageKey).startsWith(`chat/${conversationId}/`)) {
+            throw new MessagingException('Attachment does not belong to this conversation', 'INVALID_MEDIA');
+        }
     }
 }
 
@@ -135,7 +163,7 @@ export const sendMessage = async ({senderId, senderDeviceId, payload}) => {
                     from: {userId: String(senderId), deviceId: senderDeviceId}
                 }
             };
-            if(online.has(envelop.toDeviceId)) deliverNow.push(target);
+            if(online.has(envelope.toDeviceId)) deliverNow.push(target);
             else toQueue.push(target);
         }
     }));
