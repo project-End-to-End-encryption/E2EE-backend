@@ -10,6 +10,8 @@ import {registerConversationEvents} from "./events/conversation.event.js";
 import {registerSidebarEvents} from "./events/sidebar.event.js";
 import {registerHistoryEvents} from "./events/history.event.js";
 import {registerSyncEvents} from "./events/sync.event.js";
+import {registerUserEvents} from "./events/user.event.js";
+import {registerMediaEvents} from "./events/media.event.js";
 
 
 export const handleConnection = async (io, socket) =>{
@@ -26,6 +28,8 @@ export const handleConnection = async (io, socket) =>{
         registerHistoryEvents(io, socket);
         registerMessageEvents(io, socket);
         registerSyncEvents(io, socket);
+        registerUserEvents(io, socket);
+        registerMediaEvents(io, socket);
         registerAiEvent(io, socket);
 
     } catch (error){
