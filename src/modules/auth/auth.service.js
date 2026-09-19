@@ -79,7 +79,7 @@ class AuthService{
                 session
             );
             newUser = await this.userRepository.createUser(
-            {username, authId: newAuth._id}, session
+                {username, authId: newAuth._id}, session
             );
 
             await session.commitTransaction();
