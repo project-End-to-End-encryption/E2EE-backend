@@ -8,64 +8,64 @@ import {conversationRoom, deviceRoom} from "../../../shared/utils/socketRooms.js
 export const registerMessageEvents = (io, socket) => {
     const {userId, deviceId} = socket.user;
 
-  socket.on(SOCKET_EVENTS.MESSAGE_SEND, withRateLimit(
-      'messageSend', RATE_LIMITS.messageSend, userId,
-      async (payload, ack) => {
-          const result = await messageService.sendMessage({
-              senderId: userId,
-              senderDeviceId: deviceId,
-              payload
-          });
+    socket.on(SOCKET_EVENTS.MESSAGE_SEND, withRateLimit(
+        'messageSend', RATE_LIMITS.messageSend, userId,
+        async (payload, ack) => {
+            const result = await messageService.sendMessage({
+                senderId: userId,
+                senderDeviceId: deviceId,
+                payload
+            });
 
-          if(result.duplicate) {
-              return ack?.({
-                  ok: true,
-                  duplicates: true,
-                  messageId: result.message._id.toString(),
-                  seq: result.message.seq,
-                  sendAt: result.message.sendAt
-              });
-          }
-          const {message} = result;
+            if(result.duplicate) {
+                return ack?.({
+                    ok: true,
+                    duplicates: true,
+                    messageId: result.message._id.toString(),
+                    seq: result.message.seq,
+                    sentAt: result.message.sentAt
+                });
+            }
+            const {message} = result;
 
-          for(const target of result.deliverNow){
-              io.to(deviceRoom(target.toUserId, target.toDeviceId))
-                  .emit(SOCKET_EVENTS.MESSAGE_ENVELOPE, target.envelop);
-          }
+            for(const target of result.deliverNow){
+                io.to(deviceRoom(target.toUserId, target.toDeviceId))
+                    .emit(SOCKET_EVENTS.MESSAGE_ENVELOPE, target.envelop);
+            }
 
-          if(result.groupPayload){
-              socket.to(conversationRoom(payload.conversationId))
-                  .emit(SOCKET_EVENTS.MESSAGE_ENVELOPE, {
-                      kind: 'group',
-                      conversationId: payload.conversationId,
-                      messageId: message._id.toString(),
-                      seq: message.seq,
-                      clientMessageId: payload.clientMessageId,
-                      from: { userId, deviceId },
-                      ...result.groupPayload
-                  });
-          }
-          socket.to(conversationRoom(payload.conversationId))
-              .emit(SOCKET_EVENTS.MESSAGE_NEW, {
-                  conversationId: payload.conversationId,
-                  messageId: message._id.toString(),
-                  seq: message.seq,
-                  senderId: userId,
-                  contentType: message.contentType,
-                  sentAt: message.sentAt
-              });
-          ack?.({
-              ok: true,
-              duplicate: false,
-              messageId: message._id.toString(),
-              seq: message.seq,
-              sentAt: message.sentAt,
-              queued: result.queuedCount
-          });
-      }
-  ));
+            if(result.groupPayload){
+                socket.to(conversationRoom(payload.conversationId))
+                    .emit(SOCKET_EVENTS.MESSAGE_ENVELOPE, {
+                        kind: 'group',
+                        conversationId: payload.conversationId,
+                        messageId: message._id.toString(),
+                        seq: message.seq,
+                        clientMessageId: payload.clientMessageId,
+                        from: { userId, deviceId },
+                        ...result.groupPayload
+                    });
+            }
+            socket.to(conversationRoom(payload.conversationId))
+                .emit(SOCKET_EVENTS.MESSAGE_NEW, {
+                    conversationId: payload.conversationId,
+                    messageId: message._id.toString(),
+                    seq: message.seq,
+                    senderId: userId,
+                    contentType: message.contentType,
+                    sentAt: message.sentAt
+                });
+            ack?.({
+                ok: true,
+                duplicate: false,
+                messageId: message._id.toString(),
+                seq: message.seq,
+                sentAt: message.sentAt,
+                queued: result.queuedCount
+            });
+        }
+    ));
 
-  // receipts
+    // receipts
 
     socket.on(SOCKET_EVENTS.MESSAGE_READ, withRateLimit(
         'receipts', RATE_LIMITS.receipts, userId,
@@ -125,7 +125,5 @@ export const registerMessageEvents = (io, socket) => {
         socket.to(conversationRoom(conversationId))
             .emit(SOCKET_EVENTS.MESSAGE_TYPING, {conversationId, userId, isTyping: !!isTyping});
     })
-
-
 
 }
