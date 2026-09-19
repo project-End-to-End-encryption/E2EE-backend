@@ -4,7 +4,7 @@
 import redisClient from "../../config/redis.config.js";
 import {REDIS_KEYS} from "../constants/redisKeys.js";
 
-export const consumeTokens = async (bucket, identity, {limit, windowSecond}) => {
+export const consumeTokens = async (bucket, identity, {limit, windowSeconds}) => {
     const key = REDIS_KEYS.rateLimit(bucket,identity);
 
     try{
@@ -21,7 +21,7 @@ export const consumeTokens = async (bucket, identity, {limit, windowSecond}) => 
             return { count, ttl }
             `,{
                 keys: [key],
-                arguments: [String(windowSecond)]
+                arguments: [String(windowSeconds)]
             }
         );
 
@@ -31,7 +31,7 @@ export const consumeTokens = async (bucket, identity, {limit, windowSecond}) => 
         return {
             allowed: count <= limit,
             remaining: Math.max(0, limit - count),
-            retryAfter: ttl > 0 ? ttl : windowSecond
+            retryAfter: ttl > 0 ? ttl : windowSeconds
         };
     } catch(error){
         console.error('[rateLimiter] redis failure, failing open:', error.message);
@@ -44,7 +44,9 @@ export const RATE_LIMITS = {
     conversation:  { limit: 60,  windowSeconds: 60 },
     syncPull:      { limit: 60,  windowSeconds: 60 },
     receipts:      { limit: 600, windowSeconds: 60 },  // cheap, high volume
-    typing:        { limit: 600, windowSeconds: 60 }
+    typing:        { limit: 600, windowSeconds: 60 },
+    userSearch:    { limit: 90,  windowSeconds: 60 },  // debounced client, still bounded
+    media:         { limit: 120, windowSeconds: 60 }   // one grant per attachment
 };
 
 // Wraps a socket handler with a rate-limit check.

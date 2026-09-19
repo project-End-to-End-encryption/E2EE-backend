@@ -4,11 +4,11 @@ import connectToMongoDB from './config/mongo.config.js';
 import redisClient from "./config/redis.config.js";
 import app from './app.js'
 import fs from 'fs';
-import MinioStorageRepository from "./repositories/implementations/minio/minio.storage.repository.js";
+import {getStorage, initStorage} from "./repositories/storage/storageProvider.js";
 import {initWebsocketServer} from "./infrastructure/websocket/websocketServer.js";
 
 const PORT = process.env.PORT || 3000;
-const storageRepository = new MinioStorageRepository();
+const storageRepository = getStorage();
 
 const options = {
     key: fs.readFileSync('/etc/ssl/tailscale/ubcli.tail2786c2.ts.net.key'),

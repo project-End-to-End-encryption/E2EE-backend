@@ -2,7 +2,7 @@ export const SOCKET_EVENTS = {
 
 
     // keys / pre-key bundles
-     KEYS_REGISTER: 'keys:register',
+    KEYS_REGISTER: 'keys:register',
     KEYS_FETCH_BUNDLE: 'keys:fetchBundle',
     KEYS_COUNT_OTPK: 'keys:countOneTimePreKeys',
     KEYS_TOP_UP_OTPK: 'keys:topUpOneTimePreKeys',
@@ -23,6 +23,18 @@ export const SOCKET_EVENTS = {
     CONVERSATION_CLEAR: 'conversation:clear',
     CONVERSATION_CREATED: 'conversation:created',
     CONVERSATION_UPDATED: 'conversation:updated',
+
+    // users (directory lookup)
+
+    USERS_SEARCH: 'users:search',
+    USERS_PROFILES: 'users:profiles',
+
+    // encrypted media (ciphertext in, ciphertext out - see media.service.js)
+
+    MEDIA_REQUEST_UPLOAD: 'media:requestUpload',
+    MEDIA_COMPLETE_UPLOAD: 'media:completeUpload',
+    MEDIA_REQUEST_DOWNLOAD: 'media:requestDownload',
+    MEDIA_ABORT_UPLOAD: 'media:abortUpload',
 
     // sideBar sync
     SIDEBAR_SYNC: 'sidebar:sync',

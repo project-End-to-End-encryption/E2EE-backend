@@ -14,12 +14,19 @@ export const REDIS_KEYS = {
     conversationMembers: (conversationId) => `conv:members:${conversationId}`,
 
     // sidebar revision
-    sidebarRev: (userId) => `sidebar:rev:${userId}`
+    sidebarRev: (userId) => `sidebar:rev:${userId}`,
+
+    // an outstanding upload grant: proves the server minted this object key
+    mediaGrant: (attachmentId) => `media:grant:${attachmentId}`
 };
 
 export const REDIS_TTL = {
     conversationMembers: 300,   // 5 minutes
     devicePresence: 3600, // refreshed on every connect
 
-    sidebarRev: 60 * 60 * 24 * 30
+    sidebarRev: 60 * 60 * 24 * 30,
+
+    // slightly longer than the presigned PUT so a slow upload can still be
+    // completed, short enough that abandoned grants evaporate
+    mediaGrant: 60 * 30
 }
