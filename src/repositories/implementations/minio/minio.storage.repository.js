@@ -4,6 +4,13 @@ import path from 'path';
 import StorageRepository from "../../interfaces/storage/storage.repository.js";
 import minioConfig from "../../../config/minio.config.js";
 
+/**
+ * MinIO implementation of StorageRepository.
+ *
+ * This is the ONLY file in the backend that imports the minio client, and no
+ * file outside src/repositories/ imports this class directly - resolve it
+ * through repositories/storage/storageProvider.js instead.
+ */
 class MinioStorageRepository extends StorageRepository{
     constructor(config = minioConfig) {
         super();
@@ -19,6 +26,7 @@ class MinioStorageRepository extends StorageRepository{
 
     async init(){
         for(const bucket of Object.values(this.buckets)){
+            if (!bucket) continue;
             const exists = await this.client.bucketExists(bucket);
             if (!exists) await this.client.makeBucket(bucket);
         }
@@ -62,6 +70,55 @@ class MinioStorageRepository extends StorageRepository{
         await this.client.removeObject(this.buckets.encryptedAttachment, key);
     }
 
+    // ---- encrypted media: key minting + presigned grants -------------------
+
+    buildAttachmentKey({conversationId = 'misc', kind = 'blob'} = {}){
+        // No extension, no file name. The object is a sealed blob and its key
+        // must not describe what is inside it.
+        return `chat/${conversationId}/${kind}/${randomUUID()}`;
+    }
+
+    async createUploadTarget({key, expirySeconds = 15 * 60} = {}){
+        const url = await this.client.presignedPutObject(
+            this.buckets.encryptedAttachment,
+            key,
+            expirySeconds
+        );
+
+        return {
+            url,
+            method: 'PUT',
+            // application/octet-stream everywhere: the real type is inside the
+            // ciphertext and the storage layer has no business knowing it.
+            headers: {'Content-Type': 'application/octet-stream'},
+            expiresAt: Date.now() + expirySeconds * 1000
+        };
+    }
+
+    async createDownloadUrl({key, expirySeconds = 5 * 60} = {}){
+        const url = await this.client.presignedGetObject(
+            this.buckets.encryptedAttachment,
+            key,
+            expirySeconds
+        );
+        return {url, expiresAt: Date.now() + expirySeconds * 1000};
+    }
+
+    async statAttachment(key){
+        try {
+            const stat = await this.client.statObject(this.buckets.encryptedAttachment, key);
+            return {
+                size: stat.size,
+                etag: stat.etag,
+                lastModified: stat.lastModified
+            };
+        } catch (error) {
+            if (error?.code === 'NotFound' || error?.code === 'NoSuchKey') return null;
+            throw error;
+        }
+    }
+
+
     async getPresignedUrl(bucket, key, expirySeconds = 60 * 5){
         return this.client.presignedGetObject(bucket, key, expirySeconds);
     }
@@ -84,4 +141,3 @@ class MinioStorageRepository extends StorageRepository{
 }
 
 export default MinioStorageRepository;
-
