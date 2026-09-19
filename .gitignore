@@ -146,4 +146,4 @@ vite.config.ts.timestamp-*
 .vite/
 
 #AI prompt
-prompt.txt
+.prompt.txt
