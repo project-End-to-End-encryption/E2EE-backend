@@ -6,7 +6,10 @@ import {
 import {registerKeyEvent} from "./events/keys.event.js";
 import {registerAiEvent} from "./events/ai.event.js";
 import {registerMessageEvents} from "./events/message.event.js";
-import {deviceRoom, userRoom} from "../../shared/utils/socketRooms.js";
+import {registerConversationEvents} from "./events/conversation.event.js";
+import {registerSidebarEvents} from "./events/sidebar.event.js";
+import {registerHistoryEvents} from "./events/history.event.js";
+import {registerSyncEvents} from "./events/sync.event.js";
 
 
 export const handleConnection = async (io, socket) =>{
@@ -16,16 +19,15 @@ export const handleConnection = async (io, socket) =>{
         await joinRooms(socket);
         await markOnline(userId, deviceId, socket.id);
 
-
-
+        // registration
         registerKeyEvent(io, socket);
-
+        registerConversationEvents(io, socket);
+        registerSidebarEvents(io, socket);
+        registerHistoryEvents(io, socket);
         registerMessageEvents(io, socket);
-        // all the business logic here
-        // register typingEvent
-        // register messageEvent
-        // register sessionEvent
-        // and more
+        registerSyncEvents(io, socket);
+        registerAiEvent(io, socket);
+
     } catch (error){
         console.error(`Socket initialization failed for user ${userId}:`, error);
         socket.disconnect(true);
@@ -34,7 +36,7 @@ export const handleConnection = async (io, socket) =>{
 
     socket.on('disconnect', async ()=>{
         try{
-            const remaining = await markOffline(userId, socket.id);
+            const remaining = await markOffline(userId, deviceId, socket.id);
 
             if(remaining === 0){
                 // last device gone mark user to offline business logic
