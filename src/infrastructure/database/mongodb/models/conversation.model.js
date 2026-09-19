@@ -18,13 +18,29 @@ const memberSchema = new mongoose.Schema({
     },
     joinedAt: {
         type: Date,
-        default: Date.now()
+        default: Date.now
     },
     joinedAtSeq: {
         type: Number,
         default: 0
     }
 }, {_id: false});
+
+const leftMemberSchema = new mongoose.Schema({
+    userId: {
+        type: String,
+        required: true
+    },
+    at: {
+        type: Date,
+        required: true,
+        default: Date.now
+    },
+    reason: {
+        type: String,
+        enum: ['removed', 'left'], default: 'removed'
+    },
+},{_id: false});
 
 const conversationSchema = new mongoose.Schema({
     type: {
@@ -54,6 +70,10 @@ const conversationSchema = new mongoose.Schema({
         default: [],
         index: true
     },
+    leftMembers: {
+        type: [leftMemberSchema],
+        default: []
+    },
     directKey: {
         type: String,
         default: null
@@ -80,6 +100,12 @@ const conversationSchema = new mongoose.Schema({
 
 // most recent first
 conversationSchema.index({memberIds: 1, lastMessageAt: -1});
+
+// sidebar sync
+conversationSchema.index({memberIds: 1, updatedAt: 1});
+
+// look up for left members
+conversationSchema.index({'leftMembers.userId': 1, 'leftMembers.at': 1});
 
 // Ensures each direct chat has a unique directKey; ignores null/non-string keys used by group chats.
 conversationSchema.index(
