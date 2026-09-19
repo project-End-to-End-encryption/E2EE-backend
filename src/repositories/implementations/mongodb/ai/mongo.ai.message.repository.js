@@ -1,4 +1,4 @@
-import {AiMessage} from "../../../infrastructure/database/mongodb/models/ai.message.model.js";
+import {AiMessage} from "../../../../infrastructure/database/mongodb/models/ai.message.model.js";
 
 class MongoAiMessageRepository {
 

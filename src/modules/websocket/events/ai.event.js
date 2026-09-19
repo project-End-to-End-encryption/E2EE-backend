@@ -1,5 +1,5 @@
 import MongoAiMessageRepository
-    from "../../../repositories/implementations/mongodb/mongo.ai.message.repository.js";
+    from "../../../repositories/implementations/mongodb/ai/mongo.ai.message.repository.js";
 
 import AiGeminiService
     from "../../ai/ai.gemini.service.js";
