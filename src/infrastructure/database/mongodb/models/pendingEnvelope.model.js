@@ -56,7 +56,7 @@ const pendingEnvelopeSchema = new mongoose.Schema({
     }
 }, {timestamps: false, minimize: false});
 
-pendingEnvelopeSchema.index({userId: 1, toDeviceId: 1, _id:1});
+pendingEnvelopeSchema.index({toUserId: 1, toDeviceId: 1, _id:1});
 
 pendingEnvelopeSchema.index({createdAt: 1},{expireAfterSeconds: 60 * 60 * 24 * 30});
 
