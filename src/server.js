@@ -11,8 +11,8 @@ const PORT = process.env.PORT || 3000;
 const storageRepository = getStorage();
 
 const options = {
-    key: fs.readFileSync('/etc/ssl/tailscale/ubcli.tail2786c2.ts.net.key'),
-    cert: fs.readFileSync('/etc/ssl/tailscale/ubcli.tail2786c2.ts.net.crt'),
+    key: fs.readFileSync(process.env.SSL_KEY_PATH),
+    cert: fs.readFileSync(process.env.SSL_CERT_PATH),
 };
 
 const httpServer = https.createServer(options, app);
