@@ -37,7 +37,7 @@ class MongoUserRepository extends UserRepository {
 
         const filter = { accountStatus: {
                 $in: ['active', 'in-active']
-            }};
+            }}; // TODO: change this to active
         if(excludeUserId) filter._id = {$ne: excludeUserId};
 
         if(term.includes('@') && term.includes('.')){

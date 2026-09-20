@@ -1,5 +1,5 @@
 import MinioStorageRepository from '../implementations/minio/minio.storage.repository.js';
-
+import S3StorageRepository from "../implementations/s3/s3.storage.repository.js";
 /**
  * STORAGE PROVIDER RESOLUTION
  *
@@ -28,13 +28,7 @@ const build = () => {
             return new MinioStorageRepository();
 
         case 's3':
-            // Intentionally not stubbed out with a fake. A half-implemented
-            // provider that silently returns undefined URLs is worse than a
-            // startup failure that tells you exactly what is missing.
-            throw new Error(
-                'STORAGE_PROVIDER=s3 but no S3 implementation exists yet. ' +
-                'Add s3.storage.repository.js implementing StorageRepository.'
-            );
+            return new S3StorageRepository();
 
         default:
             throw new Error(`Unknown STORAGE_PROVIDER: ${provider}`);
