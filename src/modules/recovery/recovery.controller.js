@@ -24,6 +24,11 @@ export const rotate = asyncHandler(async (req,res) => {
     res.status(200).json(new SuccessResponse('Recovery key rotated', result));
 });
 
+export const vaultStatus = asyncHandler(async (req, res) => {
+    const status = await recoveryService.getVaultStatus(currentUserId(req));
+    res.status(200).json(new SuccessResponse('Recovery vault status', status));
+});
+
 /**
  * Destructive. The client MUST show an unambiguous confirmation before calling
  * this, and the explicit body flag is a second guard against an accidental

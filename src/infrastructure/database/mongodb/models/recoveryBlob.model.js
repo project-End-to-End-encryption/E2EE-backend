@@ -67,10 +67,10 @@ const recoveryBlobSchema = new mongoose.Schema({
         required: true,
         default: 1
     },
-    lastRestoreAt: {
+    lastRestoredAt: {
         type: Date,
         default: null
     }
 }, {timestamps: true});
 
-export const RecoveryBlobModel = mongoose.model('RecoveryBlop', recoveryBlobSchema);
+export const RecoveryBlobModel = mongoose.model('RecoveryBlob', recoveryBlobSchema);

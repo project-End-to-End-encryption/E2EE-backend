@@ -69,6 +69,13 @@ const toStoredBlob = (userId, payload) => ({
  * Called once, right after signup, from the device that generated the identity key.
  */
 
+export const getVaultStatus = async (userId) => {
+    if (!userId) throw new RecoveryException('Missing UserId', 'UNAUTHENTICATED', 401);
+
+    const blob = await RecoveryRepository.findByUserId(userId);
+    return { exists: !!blob, generation: blob?.generation ?? null };
+};
+
 export const enrollVault = async (userId, payload) => {
     if (!userId) throw new RecoveryException('Missing UserId', 'UNAUTHENTICATED', 401);
     assertValidBlob(payload);
