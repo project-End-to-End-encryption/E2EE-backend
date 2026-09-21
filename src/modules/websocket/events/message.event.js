@@ -11,6 +11,18 @@ export const registerMessageEvents = (io, socket) => {
     socket.on(SOCKET_EVENTS.MESSAGE_SEND, withRateLimit(
         'messageSend', RATE_LIMITS.messageSend, userId,
         async (payload, ack) => {
+
+            // 1. LOG INCOMING MESSAGE FROM SENDER
+            console.log('[MESSAGE_SEND]', {
+                conversationId: payload.conversationId,
+                envelopeCount: payload.envelopes?.length,
+                envelopes: payload.envelopes?.map(e => ({
+                    toUserId: e.toUserId ?? e.to?.userId,
+                    toDeviceId: e.toDeviceId ?? e.to?.deviceId,
+                    type: e.type
+                }))
+            });
+
             const result = await messageService.sendMessage({
                 senderId: userId,
                 senderDeviceId: deviceId,
@@ -29,6 +41,15 @@ export const registerMessageEvents = (io, socket) => {
             const {message} = result;
 
             for(const target of result.deliverNow){
+
+                // 2. LOG OUTGOING MESSAGE TO RECEIVER DEVICE
+                const targetRoom = deviceRoom(target.toUserId, target.toDeviceId);
+                console.log('[EMIT ENVELOPE]', {
+                    toUserId: target.toUserId,
+                    toDeviceId: target.toDeviceId,
+                    room: targetRoom
+                });
+
                 io.to(deviceRoom(target.toUserId, target.toDeviceId))
                     .emit(SOCKET_EVENTS.MESSAGE_ENVELOPE, target.envelop);
             }
