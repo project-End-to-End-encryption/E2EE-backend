@@ -176,15 +176,42 @@ export const removeMember = async (conversationId, requesterId, targetUserId) =>
  *   with a laptop and a phone needs two envelopes.
  */
 
-export const getMemberDevices = async (conversationId, {excludeUserId, excludeDeviceId} = {}) => {
+export const getMemberDevices = async (
+    conversationId,
+    { excludeUserId, excludeDeviceId } = {}
+) => {
     const memberIds = await getMemberIdCached(conversationId);
-    if(!memberIds) throw new NotFoundException('Conversation not found');
 
-    const perMember = await Promise.all(memberIds.map((userId) => listUserDevice(userId)));
+    if (!memberIds) {
+        throw new NotFoundException('Conversation not found');
+    }
 
-    return perMember.flat().filter((device) => !(
-        String(device.userId) === String(excludeUserId) && device.deviceId === excludeDeviceId
-    ));
+    const perMember = await Promise.all(
+        memberIds.map(async (userId) => {
+            const devices = await listUserDevice(userId);
+
+            console.log('[MEMBER DEVICES]', {
+                userId,
+                devices
+            });
+
+            return devices;
+        })
+    );
+
+    const devices = perMember
+        .flat()
+        .filter((device) => !(
+            String(device.userId) === String(excludeUserId) &&
+            device.deviceId === excludeDeviceId
+        ));
+
+    console.log('[MEMBER DEVICES RESULT]', {
+        conversationId,
+        devices
+    });
+
+    return devices;
 };
 
 /**
