@@ -1,15 +1,12 @@
 export const SOCKET_EVENTS = {
 
-
     // keys / pre-key bundles
     KEYS_REGISTER: 'keys:register',
     KEYS_FETCH_BUNDLE: 'keys:fetchBundle',
     KEYS_COUNT_OTPK: 'keys:countOneTimePreKeys',
     KEYS_TOP_UP_OTPK: 'keys:topUpOneTimePreKeys',
 
-
     // conservation
-
     CONVERSATION_OPEN_DIRECT: 'conversation:openDirect',
     CONVERSATION_CREATE_GROUP: 'conversation:createGroup',
     CONVERSATION_LIST: 'conversation:list',
@@ -25,12 +22,11 @@ export const SOCKET_EVENTS = {
     CONVERSATION_UPDATED: 'conversation:updated',
 
     // users (directory lookup)
-
     USERS_SEARCH: 'users:search',
     USERS_PROFILES: 'users:profiles',
+    USERS_GET_PROFILE_PICTURE_URL: 'users:getProfilePictureUrl',
 
     // encrypted media (ciphertext in, ciphertext out - see media.service.js)
-
     MEDIA_REQUEST_UPLOAD: 'media:requestUpload',
     MEDIA_COMPLETE_UPLOAD: 'media:completeUpload',
     MEDIA_REQUEST_DOWNLOAD: 'media:requestDownload',
@@ -41,12 +37,10 @@ export const SOCKET_EVENTS = {
     SIDEBAR_PATCH: 'sidebar:patch',
 
     // chat history
-
     HISTORY_PAGE: 'history:page',
     HISTORY_RANGE: 'history:range',
 
     // messaging
-
     MESSAGE_SEND: 'message:send',
     MESSAGE_NEW: 'message:new',            // archive notification -> whole conversation
     MESSAGE_ENVELOPE: 'message:envelope',  // transport ciphertext -> one device
@@ -58,12 +52,10 @@ export const SOCKET_EVENTS = {
     MESSAGE_TYPING: 'message:typing',
 
     // offline sync
-
     SYNC_PULL: 'sync:pull',
     SYNC_ACK: 'sync:ack',
 
     // calls for v2
-
     CALL_INVITE: 'call:invite',
     CALL_ACCEPT: 'call:accept',
     CALL_REJECT: 'call:reject',
