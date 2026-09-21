@@ -190,11 +190,6 @@ export const getMemberDevices = async (
         memberIds.map(async (userId) => {
             const devices = await listUserDevice(userId);
 
-            console.log('[MEMBER DEVICES]', {
-                userId,
-                devices
-            });
-
             return devices;
         })
     );
@@ -206,10 +201,6 @@ export const getMemberDevices = async (
             device.deviceId === excludeDeviceId
         ));
 
-    console.log('[MEMBER DEVICES RESULT]', {
-        conversationId,
-        devices
-    });
 
     return devices;
 };
