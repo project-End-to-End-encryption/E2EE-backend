@@ -44,10 +44,18 @@ export const registerMessageEvents = (io, socket) => {
 
                 // 2. LOG OUTGOING MESSAGE TO RECEIVER DEVICE
                 const targetRoom = deviceRoom(target.toUserId, target.toDeviceId);
-                console.log('[EMIT ENVELOPE]', {
+                const sockets = await io.in(targetRoom).fetchSockets();
+                console.log('[ROOM CHECK]', {
+                    room: targetRoom,
                     toUserId: target.toUserId,
                     toDeviceId: target.toDeviceId,
-                    room: targetRoom
+                    socketCount: sockets.length,
+                    sockets: sockets.map(s => ({
+                        id: s.id,
+                        userId: s.user?.userId,
+                        deviceId: s.user?.deviceId,
+                        rooms: [...s.rooms]
+                    }))
                 });
 
                 io.to(deviceRoom(target.toUserId, target.toDeviceId))
