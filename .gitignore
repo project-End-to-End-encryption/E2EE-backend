@@ -147,3 +147,7 @@ vite.config.ts.timestamp-*
 
 #AI prompt
 .prompt.txt
+
+scripts/
+
+*.zip
