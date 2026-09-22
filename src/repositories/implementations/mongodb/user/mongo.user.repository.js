@@ -1,7 +1,7 @@
 import {User} from '../../../../infrastructure/database/mongodb/models/user.model.js';
 import {Auth} from '../../../../infrastructure/database/mongodb/models/auth.model.js';
 import UserRepository from '../../../interfaces/database/user/user.repository.js';
-
+import mongoose from 'mongoose';
 // Only these fields ever leave the directory. No email, no authId, no
 // timestamps - see modules/user/userSearch/userSearch.service.js.
 const PUBLIC_PROJECTION = 'username fullName profilePictureKey accountStatus';
@@ -38,7 +38,7 @@ class MongoUserRepository extends UserRepository {
         const filter = { accountStatus: {
                 $in: ['active', 'in-active']
             }}; // TODO: change this to active
-        if(excludeUserId) filter._id = {$ne: excludeUserId};
+        if(excludeUserId) Filter._id = {$ne: new mongoose.Types.ObjectId(excludeUserId)};
 
         if(term.includes('@') && term.includes('.')){
             const auth = await Auth.findOne({email: term}).select('_id').lean();
