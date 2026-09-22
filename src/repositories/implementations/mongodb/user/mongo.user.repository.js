@@ -38,7 +38,7 @@ class MongoUserRepository extends UserRepository {
         const filter = { accountStatus: {
                 $in: ['active', 'in-active']
             }}; // TODO: change this to active
-        if(excludeUserId) Filter._id = {$ne: new mongoose.Types.ObjectId(excludeUserId)};
+        if(excludeUserId) filter._id = {$ne: new mongoose.Types.ObjectId(excludeUserId)};
 
         if(term.includes('@') && term.includes('.')){
             const auth = await Auth.findOne({email: term}).select('_id').lean();
