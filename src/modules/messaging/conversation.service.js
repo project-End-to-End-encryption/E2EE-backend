@@ -159,8 +159,8 @@ export const removeMember = async (conversationId, requesterId, targetUserId) =>
         throw new ForbiddenException('Cannot remove the group owner', 'NOT_AUTHORIZED');
     }
     const updated = await ConversationRepository.removeMember(conversationId, targetUserId);
+    await invalidateMembers(conversationId);
     const newEpoch = await ConversationRepository.bumpKeyEpoch(conversationId);
-    await invalidateMembers(conversationId); // This line needs to be moved
 
     return {
         conversation: updated,
