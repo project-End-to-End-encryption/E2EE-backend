@@ -94,11 +94,6 @@ class MongoConversationRepository extends IConversationRepository{
 
     async addMember(conversationId, userId, role = 'member'){
         const id = toId(userId);
-        // we may be remove this 2 lines
-        const current =
-            await ConversationModel.findById(conversationId, { lastSeq: 1}).lean();
-
-        if(!current) return null;
 
         return ConversationModel.findOneAndUpdate(
             {_id: conversationId, memberIds: {$ne: id}},
@@ -116,15 +111,18 @@ class MongoConversationRepository extends IConversationRepository{
             {returnDocument: 'after'}
         ).lean();
     }
-
-    async removeMember(conversationId, userId){
+    async removeMember(conversationId, userId) {
         const id = toId(userId);
+
         return ConversationModel.findOneAndUpdate(
-            {_id: conversationId},
+            { _id: conversationId },
             {
-                $pull: { members: { userId: id }, memberIds: id }
+                $pull: {
+                    members: { userId: id },
+                    memberIds: id
+                }
             },
-            {returnDocument: 'after'}
+            { returnDocument: 'after' }
         ).lean();
     }
 

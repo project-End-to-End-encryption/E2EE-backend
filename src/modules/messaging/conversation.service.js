@@ -160,7 +160,7 @@ export const removeMember = async (conversationId, requesterId, targetUserId) =>
     }
     const updated = await ConversationRepository.removeMember(conversationId, targetUserId);
     const newEpoch = await ConversationRepository.bumpKeyEpoch(conversationId);
-    await invalidateMembers(conversationId);
+    await invalidateMembers(conversationId); // This line needs to be moved
 
     return {
         conversation: updated,
@@ -168,7 +168,6 @@ export const removeMember = async (conversationId, requesterId, targetUserId) =>
         rekeyRequired: true
     };
 }
-
 /**
  * Device fan-out
  *   Flattens membership into the full device list.
