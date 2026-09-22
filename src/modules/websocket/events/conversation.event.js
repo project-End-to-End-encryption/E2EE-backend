@@ -66,14 +66,15 @@ export const registerConversationEvents = (io, socket) => {
         async ({ conversationId, newUserId }, ack) => {
             const conversation = await conversationService.addMember(conversationId, userId, newUserId);
             const room = conversationRoom(conversationId);
+            const row = { ...conversation, _id: conversationId};
 
             io.in(userRoom(newUserId)).socketsJoin(room);
             io.to(room).emit(SOCKET_EVENTS.CONVERSATION_UPDATED, {
-                conversationId, change: 'memberAdded', userId: newUserId
+                conversationId, change: 'memberAdded', userId: newUserId, conversation: row
             });
 
 
-            ack?.({ ok: true, conversation, distributeKeyTo: newUserId });
+            ack?.({ ok: true, conversation: row, distributeKeyTo: newUserId });
         }
     ));
 
@@ -83,6 +84,7 @@ export const registerConversationEvents = (io, socket) => {
         async ({ conversationId, targetUserId }, ack) => {
             const result = await conversationService.removeMember(conversationId, userId, targetUserId);
             const room = conversationRoom(conversationId);
+            const row = { ...result.conversation, _id: conversationId };
 
             io.in(userRoom(targetUserId)).socketsLeave(room);
 
@@ -94,10 +96,11 @@ export const registerConversationEvents = (io, socket) => {
                 change: 'memberRemoved',
                 userId: targetUserId,
                 keyEpoch: result.keyEpoch,
-                rekeyRequired: true
+                rekeyRequired: true,
+                conversation: row
             });
 
-            ack?.({ ok: true, ...result });
+            ack?.({ ok: true, ...result, conversation: row});
         }
     ));
 
