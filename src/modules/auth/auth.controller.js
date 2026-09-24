@@ -95,18 +95,39 @@ export const logout = asyncHandler(async (req,res) =>{
     res.status(200).json(new SuccessResponse('Logged out successfully', null));
 });
 
-export const refreshToken = asyncHandler(async (req,res) => {
-    const {refreshToken, sessionId} = req.cookies;
+export const refreshToken = asyncHandler(async (req, res) => {
+    const { refreshToken, sessionId } = req.cookies;
 
-    if(!refreshToken || !sessionId){
-        throw new InvalidTokenException('Refresh token required', 'REFRESH_TOKEN_REQUIRED');
+    if (!refreshToken || !sessionId) {
+        throw new InvalidTokenException(
+            'Refresh token required',
+            'REFRESH_TOKEN_REQUIRED'
+        );
     }
 
-    const {accessToken} = await authService.refreshAccessToken(refreshToken,sessionId);
+    const result = await authService.refreshAccessToken(
+        refreshToken,
+        sessionId
+    );
 
-    res.cookie('accessToken', accessToken, {...cookieOption, maxAge: 15 * 60 * 1000});
+    res.cookie(
+        'accessToken',
+        result.accessToken,
+        {
+            ...cookieOption,
+            maxAge: 15 * 60 * 1000,
+        }
+    );
 
-    res.status(200).json(new SuccessResponse('Access token refresh', null));
-})
+    res.status(200).json(
+        new SuccessResponse(
+            'Access token refresh',
+            {
+                userId: result.userId,
+                authId: result.authId,
+            }
+        )
+    );
+});
 
 // cookie path set up will be done later

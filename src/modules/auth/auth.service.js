@@ -184,26 +184,49 @@ class AuthService{
         }
     }
 
-    async refreshAccessToken(refreshToken, sessionId){
+    async refreshAccessToken(refreshToken, sessionId) {
         let decoded;
-        try{
+
+        try {
             decoded = verifyRefreshToken(refreshToken);
-        } catch (error){
-            if(error.name === 'TokenExpiredError'){
-                throw new InvalidTokenException('Refresh token has expire', 'REFRESH_TOKEN_EXPIRED');
+        } catch (error) {
+            if (error.name === 'TokenExpiredError') {
+                throw new InvalidTokenException(
+                    'Refresh token has expire',
+                    'REFRESH_TOKEN_EXPIRED'
+                );
             }
-            throw new InvalidTokenException('Invalid refresh token', 'INVALID_REFRESH_TOKEN');
+
+            throw new InvalidTokenException(
+                'Invalid refresh token',
+                'INVALID_REFRESH_TOKEN'
+            );
         }
 
-        const session = await this.sessionRepository.findBySessionId(sessionId);
-        if(!session){
-            throw new InvalidTokenException('Session not found', 'SESSION_INVALID');
+        const session =
+            await this.sessionRepository.findBySessionId(sessionId);
+
+        if (!session) {
+            throw new InvalidTokenException(
+                'Session not found',
+                'SESSION_INVALID'
+            );
         }
-        const isMatch = await compareRefreshToken(refreshToken, session.hashedRefreshToken);
-        if(!isMatch){
-            throw new InvalidTokenException('Refresh token reuse detected', 'SESSION_INVALID')
+
+        const isMatch = await compareRefreshToken(
+            refreshToken,
+            session.hashedRefreshToken
+        );
+
+        if (!isMatch) {
+            throw new InvalidTokenException(
+                'Refresh token reuse detected',
+                'SESSION_INVALID'
+            );
         }
-        const user = await this.userRepository.findByAuthId(decoded.authId);
+
+        const user =
+            await this.userRepository.findByAuthId(decoded.authId);
 
         if (!user) {
             throw new InvalidTokenException(
@@ -212,9 +235,16 @@ class AuthService{
             );
         }
 
-        const accessToken = generateAccessToken({userId: user._id, authId: decoded.authId});
+        const accessToken = generateAccessToken({
+            userId: user._id,
+            authId: decoded.authId,
+        });
 
-        return {accessToken};
+        return {
+            accessToken,
+            userId: user._id,
+            authId: decoded.authId,
+        };
     }
 }
 export default AuthService;
