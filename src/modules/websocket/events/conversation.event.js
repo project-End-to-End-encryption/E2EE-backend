@@ -110,9 +110,8 @@ export const registerConversationEvents = (io, socket) => {
         'keyFetch', RATE_LIMITS.keyFetch, userId,
         async ({ conversationId, includeOwnOtherDevices = true }, ack) => {
             const devices = await conversationService.getMemberDevices(conversationId, {
+                requesterId: userId,
                 excludeUserId: userId,
-                // Your OTHER devices must receive their own copy, or messages you
-                // send from your phone never appear on your laptop in real time.
                 excludeDeviceId: includeOwnOtherDevices ? deviceId : null
             });
             ack?.({ ok: true, devices });
