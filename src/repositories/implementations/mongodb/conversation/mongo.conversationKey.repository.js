@@ -1,14 +1,39 @@
 import IConversationKeyRepository from "../../../interfaces/database/conversation/conversationKey.repository.js";
 import {ConversationKeyModel} from "../../../../infrastructure/database/mongodb/models/conversationKey.model.js";
+import {ConversationKeyClaimModel } from "../../../../infrastructure/database/mongodb/models/conversationKeyClaim.model.js"
 
 class MongoConversationKeyRepository extends IConversationKeyRepository{
 
-    async upsert({conversationId, userId, epoch, iv, ciphertext, blobGeneration}){
-        return ConversationKeyModel.findOneAndUpdate(
-            {conversationId, userId: String(userId), epoch},
-            {$set: {iv, ciphertext, blobGeneration}},
-            { returnDocument: 'after', upsert: true, runValidators: true }
-        ).lean();
+    async claimEpoch(conversationId, epoch, userId) {
+        try {
+            await ConversationKeyClaimModel.create({
+                conversationId, epoch, mintedBy: String(userId)
+            });
+            return true;
+        } catch (error) {
+            if (error?.code === 11000) return false;   // duplicate key: lost the race
+            throw error;
+        }
+    }
+
+    async isEpochClaimed(conversationId, epoch) {
+        return !!(await ConversationKeyClaimModel.exists({ conversationId, epoch }));
+    }
+
+    async releaseClaim(conversationId, epoch, userId) {
+        await ConversationKeyClaimModel.deleteOne({
+            conversationId, epoch, mintedBy: String(userId)
+        });
+    }
+
+    async insertCopyOnce(conversationId, userId, { epoch, iv, ciphertext, blobGeneration }) {
+        try {
+            await ConversationKeyModel.create({
+                conversationId, userId: String(userId), epoch, iv, ciphertext, blobGeneration
+            });
+        } catch (error) {
+            if (error?.code !== 11000) throw error;   // real errors still surface
+        }
     }
 
     async findForUser(conversationId, userId, epoch = null){

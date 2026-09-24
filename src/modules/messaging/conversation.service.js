@@ -134,7 +134,14 @@ export const addMember = async (conversationId, requesterId, newUserId) => {
     const updated = await ConversationRepository.addMember(conversationId, newUserId);
     await invalidateMembers(conversationId);
 
-    return updated || conversation;
+    const newEpoch = await ConversationRepository.bumpKeyEpoch(conversationId);
+
+    return {
+        // `updated` was read BEFORE the bump, so overwrite its stale keyEpoch
+        conversation: { ...updated, keyEpoch: newEpoch },
+        keyEpoch: newEpoch,
+        rekeyRequired: true
+    };
 };
 
 /**
@@ -177,12 +184,16 @@ export const removeMember = async (conversationId, requesterId, targetUserId) =>
 
 export const getMemberDevices = async (
     conversationId,
-    { excludeUserId, excludeDeviceId } = {}
+    { requesterId, excludeUserId, excludeDeviceId } = {}
 ) => {
     const memberIds = await getMemberIdCached(conversationId);
 
     if (!memberIds) {
         throw new NotFoundException('Conversation not found');
+    }
+
+    if (!memberIds.includes(String(requesterId))) {
+        throw new ForbiddenException('Not a member of this conversation', 'NOT_A_MEMBER');
     }
 
     const perMember = await Promise.all(
@@ -209,24 +220,56 @@ export const getMemberDevices = async (
  *  Store a member's MBK-wrapped copy of the Conversation Archive Key.
  */
 
-export const putArchiveKey = async (conversationId, userId, {epoch, iv, ciphertext, blobGeneration}) => {
-    if(!(await isMember(conversationId, userId))){
+/**
+ * Store a member's MBK-wrapped copy of the Conversation Archive Key.
+ *
+ *  mode 'mint': "I am creating this epoch's key for the whole conversation".
+ *               Only ONE member can ever win this per (conversation, epoch).
+ *  mode 'copy': "I received the key from the minter; store my own wrapped copy".
+ */
+export const putArchiveKey = async (
+    conversationId,
+    userId,
+    { epoch, iv, ciphertext, blobGeneration, mode = 'copy' }
+) => {
+    if (!(await isMember(conversationId, userId))) {
         throw new ForbiddenException('Not a member of this conversation', 'NOT_A_MEMBER');
     }
-    if (!iv || !ciphertext) {
-        throw new MessagingException('iv and ciphertext required', 'INVALID_PAYLOAD');
-    }
-    return ConversationKeyRepository.upsert({
-        conversationId,
-        userId,
-        epoch: Number(epoch) || 1,
-        iv,
-        ciphertext,
-        blobGeneration: Number(blobGeneration) || 1
-    });
-};
 
-export const getArchiveKey = async (conversationId, userId, epoch = null) => {
+    const epochNum = Number(epoch);
+    const conversation = await ConversationRepository.findById(conversationId);
+    if (!conversation) throw new NotFoundException('Conversation not found');
+
+    // A member must not be able to pre-claim epochs that don't exist yet
+    if (!Number.isInteger(epochNum) || epochNum < 1 || epochNum > (conversation.keyEpoch ?? 1)) {
+        throw new MessagingException('Invalid epoch', 'INVALID_PAYLOAD');
+    }
+
+    if (mode === 'mint') {
+        // Atomic: the unique (conversationId, epoch) index decides the winner
+        const won = await ConversationKeyRepository.claimEpoch(conversationId, epochNum, userId);
+        if (!won) {
+            throw new MessagingException('Archive key already minted for this epoch', 'ARCHIVE_KEY_EXISTS');
+        }
+    } else if (!(await ConversationKeyRepository.isEpochClaimed(conversationId, epochNum))) {
+        throw new MessagingException('No archive key minted for this epoch yet', 'ARCHIVE_KEY_NOT_MINTED');
+    }
+
+    try {
+        // $setOnInsert never modifies an existing copy, so this cannot overwrite a key
+        await ConversationKeyRepository.insertCopyOnce(conversationId, userId, {
+            epoch: epochNum, iv, ciphertext, blobGeneration
+        });
+    } catch (error) {
+        // Don't leave a claim behind with no key stored, or nobody can ever mint this epoch
+        if (mode === 'mint') {
+            await ConversationKeyRepository.releaseClaim(conversationId, epochNum, userId).catch(() => {});
+        }
+        throw error;
+    }
+
+    return { epoch: epochNum };
+};export const getArchiveKey = async (conversationId, userId, epoch = null) => {
     if(!(await isMember(conversationId, userId))){
         throw new ForbiddenException('Not a member of this conversation', 'NOT_A_MEMBER');
     }

@@ -121,9 +121,9 @@ export const registerConversationEvents = (io, socket) => {
 
     socket.on(SOCKET_EVENTS.CONVERSATION_PUT_KEY, withRateLimit(
         'conversation', RATE_LIMITS.conversation, userId,
-        async ({ conversationId, epoch, iv, ciphertext, blobGeneration }, ack) => {
+        async ({ conversationId, epoch, iv, ciphertext, blobGeneration, mode = 'copy' }, ack) => {
             const saved = await conversationService.putArchiveKey(conversationId, userId, {
-                epoch, iv, ciphertext, blobGeneration
+                epoch, iv, ciphertext, blobGeneration, mode
             });
             ack?.({ ok: true, epoch: saved.epoch });
         }
