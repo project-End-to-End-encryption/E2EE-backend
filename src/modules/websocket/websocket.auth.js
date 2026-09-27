@@ -1,4 +1,4 @@
-import cookie from 'cookie';
+import * as cookie from 'cookie';
 import {verifyAccessToken} from "../../shared/utils/jwt.js";
 
 const DEVICE_ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
