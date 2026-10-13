@@ -1,10 +1,10 @@
-import * as cookie from 'cookie';
+import { parseCookie } from 'cookie';
 import {verifyAccessToken} from "../../shared/utils/jwt.js";
 
 const DEVICE_ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
 export const authenticateSocket = (socket, next) => {
     try{
-        const cookies = cookie.parse(socket.handshake.headers.cookie || '');
+        const cookies = parseCookie.parse(socket.handshake.headers.cookie || '');
         const token = cookies.accessToken || socket.handshake.auth?.token;
 
         if(!token){
