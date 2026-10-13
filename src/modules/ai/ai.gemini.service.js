@@ -6,12 +6,7 @@ import { getSystemPrompt } from "./ai.prompt.js";
 class AiGeminiService {
     constructor() {
         this.client = new GoogleGenAI({
-            apiKey: aiConfig.apiKey,
-            httpOptions: {
-                headers: {
-                    "x-goog-api-key": aiConfig.apiKey
-                }
-            }
+            apiKey: aiConfig.apiKey
         });
     }
 
