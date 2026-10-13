@@ -27,8 +27,9 @@ export const authenticateSocket = (socket, next) => {
         };
 
         next();
-    } catch (error){
-        if(error.name === 'TokenExpiredError'){
+    } catch (error) {
+        console.error('[ws auth] failed:', error);   // full error, not just the message
+        if (error.name === 'TokenExpiredError') {
             return next(new Error('TOKEN_EXPIRED'));
         }
         return next(new Error('INVALID_TOKEN'));
